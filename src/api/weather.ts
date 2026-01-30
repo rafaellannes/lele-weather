@@ -87,75 +87,49 @@ export async function searchCities(query: string): Promise<LocationResult[]> {
 
 /**
  * Reverse geocoding - coordenadas para nome do local
- * Usa Open-Meteo geocoding API (sem problemas de CORS)
+ * Busca cidades conhecidas próximas às coordenadas
  */
 async function getLocationByCoords(lat: number, lon: number): Promise<{ name: string; state: string } | null> {
-  try {
-    // Usar a API de geocoding do Open-Meteo para buscar cidade mais próxima
-    const params = new URLSearchParams({
-      latitude: lat.toString(),
-      longitude: lon.toString(),
-      count: '1',
-      language: 'pt',
-      format: 'json'
-    });
+  // Lista de cidades brasileiras conhecidas com coordenadas aproximadas
+  const knownCities = [
+    { name: 'Nova Iguaçu', state: 'RJ', lat: -22.7556, lon: -43.4603 },
+    { name: 'Rio de Janeiro', state: 'RJ', lat: -22.9068, lon: -43.1729 },
+    { name: 'São Paulo', state: 'SP', lat: -23.5505, lon: -46.6333 },
+    { name: 'Belo Horizonte', state: 'MG', lat: -19.9167, lon: -43.9345 },
+    { name: 'Brasília', state: 'DF', lat: -15.7975, lon: -47.8919 },
+    { name: 'Salvador', state: 'BA', lat: -12.9714, lon: -38.5014 },
+    { name: 'Curitiba', state: 'PR', lat: -25.4284, lon: -49.2733 },
+    { name: 'Fortaleza', state: 'CE', lat: -3.7172, lon: -38.5433 },
+    { name: 'Recife', state: 'PE', lat: -8.0476, lon: -34.8770 },
+    { name: 'Porto Alegre', state: 'RS', lat: -30.0346, lon: -51.2177 },
+    { name: 'Manaus', state: 'AM', lat: -3.1190, lon: -60.0217 },
+    { name: 'Belém', state: 'PA', lat: -1.4558, lon: -48.4902 },
+    { name: 'Goiânia', state: 'GO', lat: -16.6869, lon: -49.2648 },
+    { name: 'Campinas', state: 'SP', lat: -22.9099, lon: -47.0626 },
+    { name: 'Niterói', state: 'RJ', lat: -22.8833, lon: -43.1036 },
+    { name: 'Duque de Caxias', state: 'RJ', lat: -22.7858, lon: -43.3116 },
+    { name: 'São Gonçalo', state: 'RJ', lat: -22.8268, lon: -43.0634 },
+  ];
 
-    const response = await fetch(`${GEOCODING_URL}/reverse?${params}`);
+  // Encontrar cidade mais próxima (distância euclidiana simples)
+  let closest = null;
+  let minDist = Infinity;
 
-    if (!response.ok) {
-      // Fallback: tentar buscar pelo nome aproximado
-      return await getLocationBySearch(lat, lon);
+  for (const city of knownCities) {
+    const dist = Math.sqrt(Math.pow(lat - city.lat, 2) + Math.pow(lon - city.lon, 2));
+    if (dist < minDist) {
+      minDist = dist;
+      closest = city;
     }
-
-    const data = await response.json();
-    const result = data.results?.[0];
-
-    if (result) {
-      return {
-        name: result.name || 'Localização',
-        state: result.admin1 || ''
-      };
-    }
-
-    return await getLocationBySearch(lat, lon);
-  } catch {
-    return await getLocationBySearch(lat, lon);
   }
-}
 
-/**
- * Fallback: busca cidade mais próxima por coordenadas aproximadas
- */
-async function getLocationBySearch(lat: number, lon: number): Promise<{ name: string; state: string } | null> {
-  try {
-    // Buscar cidades próximas usando search com coordenadas
-    const params = new URLSearchParams({
-      name: 'city',
-      count: '1',
-      language: 'pt',
-      format: 'json',
-      latitude: lat.toString(),
-      longitude: lon.toString()
-    });
-
-    const response = await fetch(`${GEOCODING_URL}/search?${params}`);
-    
-    if (!response.ok) return null;
-
-    const data = await response.json();
-    const result = data.results?.[0];
-
-    if (result) {
-      return {
-        name: result.name || 'Localização',
-        state: result.admin1 || ''
-      };
-    }
-
-    return null;
-  } catch {
-    return null;
+  // Se a cidade mais próxima estiver a menos de ~50km (0.5 graus), usar ela
+  if (closest && minDist < 0.5) {
+    return { name: closest.name, state: closest.state };
   }
+
+  // Caso contrário, retornar localização genérica
+  return { name: 'Sua localização', state: '' };
 }
 
 /**
