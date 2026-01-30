@@ -1,0 +1,117 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'icons/*.png'],
+      manifest: {
+        name: 'LeleWeather',
+        short_name: 'LeleWeather',
+        description: 'App de clima com a mascote Lele',
+        theme_color: '#0f172a',
+        background_color: '#0f172a',
+        display: 'standalone',
+        orientation: 'portrait',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: 'icons/icon-72.png',
+            sizes: '72x72',
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: 'icons/icon-96.png',
+            sizes: '96x96',
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: 'icons/icon-128.png',
+            sizes: '128x128',
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: 'icons/icon-144.png',
+            sizes: '144x144',
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: 'icons/icon-152.png',
+            sizes: '152x152',
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: 'icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: 'icons/icon-384.png',
+            sizes: '384x384',
+            type: 'image/png',
+            purpose: 'any maskable'
+          },
+          {
+            src: 'icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/api\.open-meteo\.com\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'weather-api-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 10 // 10 minutos
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/nominatim\.openstreetmap\.org\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'geocoding-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 dias
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          }
+        ]
+      }
+    })
+  ],
+  build: {
+    sourcemap: false,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    }
+  }
+})
