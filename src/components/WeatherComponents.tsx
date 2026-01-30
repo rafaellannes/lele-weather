@@ -74,8 +74,36 @@ export const Header: React.FC<{ address: string; onSearch?: () => void }> = ({ a
       </svg>
       <span className="text-white/90 text-sm truncate">{address}</span>
     </button>
-    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center shadow-lg shadow-pink-500/20">
-      <span className="text-white text-sm font-bold">L</span>
+    {/* Avatar da Lele */}
+    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 p-0.5 shadow-lg shadow-pink-500/20">
+      <svg viewBox="0 0 100 100" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Fundo circular */}
+        <circle cx="50" cy="50" r="50" fill="#1e293b"/>
+        {/* Cabelo cacheado */}
+        <ellipse cx="50" cy="42" rx="32" ry="28" fill="#3D2314"/>
+        <ellipse cx="22" cy="45" rx="10" ry="14" fill="#3D2314"/>
+        <ellipse cx="78" cy="45" rx="10" ry="14" fill="#3D2314"/>
+        <ellipse cx="25" cy="58" rx="8" ry="10" fill="#5D3A24"/>
+        <ellipse cx="75" cy="58" rx="8" ry="10" fill="#5D3A24"/>
+        <ellipse cx="35" cy="28" rx="8" ry="7" fill="#3D2314"/>
+        <ellipse cx="65" cy="28" rx="8" ry="7" fill="#3D2314"/>
+        {/* Rosto */}
+        <ellipse cx="50" cy="52" rx="22" ry="23" fill="#D4A574"/>
+        {/* Bochechas */}
+        <ellipse cx="36" cy="58" rx="5" ry="3" fill="#E8A0A0" opacity="0.6"/>
+        <ellipse cx="64" cy="58" rx="5" ry="3" fill="#E8A0A0" opacity="0.6"/>
+        {/* Olhos felizes */}
+        <ellipse cx="40" cy="50" rx="4" ry="5" fill="white"/>
+        <ellipse cx="60" cy="50" rx="4" ry="5" fill="white"/>
+        <circle cx="41" cy="51" r="2.5" fill="#2D1810"/>
+        <circle cx="61" cy="51" r="2.5" fill="#2D1810"/>
+        <circle cx="40" cy="49" r="1" fill="white"/>
+        <circle cx="60" cy="49" r="1" fill="white"/>
+        {/* Sorriso */}
+        <path d="M 42 62 Q 50 70 58 62" stroke="#2D1810" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        {/* Vestido (topo) */}
+        <path d="M 35 73 Q 50 78 65 73 L 70 100 L 30 100 Z" fill="#FF6B9D"/>
+      </svg>
     </div>
   </div>
 );
