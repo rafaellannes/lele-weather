@@ -105,7 +105,10 @@ function App() {
                 {isLoading ? 'Atualizando...' : 'Atualizar dados'}
               </button>
               <p className="text-white/30 text-xs mt-4">
-                LeleWeather • Dados: Open-Meteo (gratuito)
+                LeleWeather • Dados: Open-Meteo
+              </p>
+              <p className="text-pink-400/60 text-xs mt-2">
+                Feito com ❤️ para Lele
               </p>
             </div>
           </>
