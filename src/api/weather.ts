@@ -3,7 +3,6 @@ import { WeatherData, WeatherIconType, LocationResult } from '../types/weather';
 
 const OPEN_METEO_URL = 'https://api.open-meteo.com/v1';
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1';
-const NOMINATIM_URL = 'https://nominatim.openstreetmap.org';
 
 /**
  * Busca dados do clima por coordenadas
@@ -88,31 +87,72 @@ export async function searchCities(query: string): Promise<LocationResult[]> {
 
 /**
  * Reverse geocoding - coordenadas para nome do local
+ * Usa Open-Meteo geocoding API (sem problemas de CORS)
  */
 async function getLocationByCoords(lat: number, lon: number): Promise<{ name: string; state: string } | null> {
   try {
+    // Usar a API de geocoding do Open-Meteo para buscar cidade mais próxima
     const params = new URLSearchParams({
-      lat: lat.toString(),
-      lon: lon.toString(),
+      latitude: lat.toString(),
+      longitude: lon.toString(),
+      count: '1',
+      language: 'pt',
+      format: 'json'
+    });
+
+    const response = await fetch(`${GEOCODING_URL}/reverse?${params}`);
+
+    if (!response.ok) {
+      // Fallback: tentar buscar pelo nome aproximado
+      return await getLocationBySearch(lat, lon);
+    }
+
+    const data = await response.json();
+    const result = data.results?.[0];
+
+    if (result) {
+      return {
+        name: result.name || 'Localização',
+        state: result.admin1 || ''
+      };
+    }
+
+    return await getLocationBySearch(lat, lon);
+  } catch {
+    return await getLocationBySearch(lat, lon);
+  }
+}
+
+/**
+ * Fallback: busca cidade mais próxima por coordenadas aproximadas
+ */
+async function getLocationBySearch(lat: number, lon: number): Promise<{ name: string; state: string } | null> {
+  try {
+    // Buscar cidades próximas usando search com coordenadas
+    const params = new URLSearchParams({
+      name: 'city',
+      count: '1',
+      language: 'pt',
       format: 'json',
-      addressdetails: '1'
+      latitude: lat.toString(),
+      longitude: lon.toString()
     });
 
-    const response = await fetch(`${NOMINATIM_URL}/reverse?${params}`, {
-      headers: {
-        'User-Agent': 'LeleWeather/1.0'
-      }
-    });
-
+    const response = await fetch(`${GEOCODING_URL}/search?${params}`);
+    
     if (!response.ok) return null;
 
     const data = await response.json();
-    const address = data.address || {};
+    const result = data.results?.[0];
 
-    return {
-      name: address.city || address.town || address.municipality || address.village || 'Localização',
-      state: address.state || ''
-    };
+    if (result) {
+      return {
+        name: result.name || 'Localização',
+        state: result.admin1 || ''
+      };
+    }
+
+    return null;
   } catch {
     return null;
   }
