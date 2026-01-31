@@ -532,7 +532,7 @@ src/
 - [x] ~~Mascote nublado mostra sol~~ ✅ **CORRIGIDO v22** - Nova `LeleCloudyDay` sem sol
 - [x] ~~BUG-002: Posição do sol em desktop wide~~ ✅ **CORRIGIDO v22** - Responsivo xl/2xl
 - [x] ~~BUG-003: MoonGlow muito transparente~~ ✅ **CORRIGIDO v22** - Aumentada visibilidade
-- [ ] BUG-004: Névoa sem efeito de background
+- [x] ~~BUG-004: Névoa sem efeito de background~~ ✅ **CORRIGIDO v22** - Novo FogEffect
 - [ ] BUG-005: Stagger classes
 - [ ] BUG-006: Chuva noturna sem estrelas
 - [x] ~~BUG-007: Animações em SunTimes/RainDetails~~ ✅ **CORRIGIDO v22**
@@ -549,7 +549,7 @@ src/
 - [ ] prefers-reduced-motion
 
 ### Novos Componentes
-- [ ] FogEffect
+- [x] ~~FogEffect~~ ✅ **CORRIGIDO v22**
 - [ ] WindLines
 - [ ] Rainbow (opcional)
 
@@ -581,11 +581,12 @@ src/
 - ✅ **Nova mascote `LeleCloudyDay`**: Lele olhando pro céu nublado, pensativa
 - ✅ **BUG-002 CORRIGIDO**: Sol agora se posiciona melhor em telas xl/2xl
 - ✅ **BUG-003 CORRIGIDO**: MoonGlow mais visível (opacidades aumentadas, tamanho maior)
+- ✅ **BUG-004 CORRIGIDO**: Novo componente `FogEffect` para clima com névoa
 - ✅ **BUG-007 CORRIGIDO**: SunTimesCard e RainDetails com animação de entrada
 
 **Arquivos modificados:**
 - `src/components/LeleMascot.tsx` - Nova mascote `LeleCloudyDay`, atualizado `leleMascotMapDay`
-- `src/components/WeatherBackground.tsx` - MoonGlow mais visível, SunRays responsivo
+- `src/components/WeatherBackground.tsx` - MoonGlow, SunRays responsivo, novo FogEffect
 - `src/components/WeatherComponents.tsx` - Animações em SunTimesCard e RainDetails
 
 ---

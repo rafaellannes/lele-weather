@@ -153,6 +153,30 @@ const FloatingClouds: React.FC<{ dark?: boolean }> = ({ dark = false }) => {
   );
 };
 
+// Componente de névoa
+const FogEffect: React.FC<{ dense?: boolean }> = ({ dense = false }) => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Camadas de névoa com movimento sutil */}
+      <div 
+        className={`absolute inset-0 bg-gradient-to-t from-slate-400/40 via-slate-300/20 to-transparent ${dense ? 'opacity-80' : 'opacity-50'}`}
+        style={{ animation: 'cloud-float 60s linear infinite' }}
+      />
+      <div 
+        className={`absolute inset-0 bg-gradient-to-b from-slate-300/30 via-transparent to-slate-400/30 ${dense ? 'opacity-70' : 'opacity-40'}`}
+        style={{ animation: 'cloud-float 45s linear infinite reverse' }}
+      />
+      {/* Faixas de névoa horizontais */}
+      <div className="absolute top-1/4 left-0 right-0 h-24 bg-gradient-to-r from-transparent via-slate-300/30 to-transparent blur-xl"
+        style={{ animation: 'cloud-float 50s linear infinite' }}
+      />
+      <div className="absolute top-2/3 left-0 right-0 h-32 bg-gradient-to-r from-transparent via-slate-400/25 to-transparent blur-2xl"
+        style={{ animation: 'cloud-float 70s linear infinite reverse' }}
+      />
+    </div>
+  );
+};
+
 // Componente de relâmpagos
 const Lightning: React.FC = () => {
   return (
@@ -228,12 +252,13 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherIco
   const isCloudy = weatherIcon === 'cloudy' || weatherIcon === 'partlyCloudy' || weatherIcon === 'partlyCloudyNight';
   const isSunny = weatherIcon === 'sunny';
   const isClearNight = weatherIcon === 'clearNight' || (isNight && weatherIcon === 'sunny');
+  const isFoggy = weatherIcon === 'foggy';
 
   return (
     <div className={`min-h-screen bg-gradient-to-b ${gradient} transition-all duration-1000 relative`}>
       {/* Partículas e efeitos */}
       {isNight && <Stars />}
-      {(isClearNight || (isNight && !isRainy && !isThunderstorm && !isSnowy)) && <MoonGlow />}
+      {(isClearNight || (isNight && !isRainy && !isThunderstorm && !isSnowy && !isFoggy)) && <MoonGlow />}
       {isSunny && !isNight && <SunRays />}
       {isRainy && <RainDrops intensity="light" />}
       {isThunderstorm && (
@@ -244,6 +269,7 @@ export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherIco
       )}
       {isSnowy && <SnowFlakes />}
       {isCloudy && <FloatingClouds dark={isNight} />}
+      {isFoggy && <FogEffect dense={!isNight} />}
       
       {/* Conteúdo */}
       <div className="relative z-10">
