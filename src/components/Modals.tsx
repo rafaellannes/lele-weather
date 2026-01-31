@@ -124,7 +124,7 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
   
   return (
     <div 
-      className="fixed inset-0 bg-slate-900 z-50 overflow-y-auto"
+      className="fixed inset-0 bg-slate-900 z-50 overflow-y-auto animate-scale-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"

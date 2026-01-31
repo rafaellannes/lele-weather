@@ -315,12 +315,22 @@ export const RainDetails: React.FC<{ rainHourly: RainHourly[]; volume: number }>
   </div>
 );
 
-// Loading Skeleton
+// Loading Skeleton with shimmer effect
 export const WeatherSkeleton: React.FC = () => (
-  <div className="animate-pulse">
-    <div className="px-4 py-6"><div className="h-4 w-16 bg-slate-700 rounded mb-2"/><div className="h-24 w-32 bg-slate-700 rounded"/></div>
-    <div className="mx-4 mb-4"><div className="h-24 bg-slate-700 rounded-2xl"/></div>
-    <div className="mx-4 mb-4"><div className="h-32 bg-slate-700 rounded-2xl"/></div>
+  <div className="space-y-4">
+    <div className="px-4 py-6">
+      <div className="h-4 w-16 bg-slate-700 rounded mb-2 animate-shimmer" />
+      <div className="h-24 w-32 bg-slate-700 rounded animate-shimmer" />
+    </div>
+    <div className="mx-4">
+      <div className="h-24 bg-slate-700 rounded-2xl animate-shimmer" />
+    </div>
+    <div className="mx-4">
+      <div className="h-32 bg-slate-700 rounded-2xl animate-shimmer" style={{ animationDelay: '0.1s' }} />
+    </div>
+    <div className="mx-4">
+      <div className="h-20 bg-slate-700 rounded-2xl animate-shimmer" style={{ animationDelay: '0.2s' }} />
+    </div>
   </div>
 );
 

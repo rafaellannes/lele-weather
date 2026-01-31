@@ -533,13 +533,9 @@ src/
 - [x] ~~BUG-002: Posição do sol em desktop wide~~ ✅ **CORRIGIDO v22** - Responsivo xl/2xl
 - [x] ~~BUG-003: MoonGlow muito transparente~~ ✅ **CORRIGIDO v22** - Aumentada visibilidade
 - [x] ~~BUG-004: Névoa sem efeito de background~~ ✅ **CORRIGIDO v22** - Novo FogEffect
-- [ ] BUG-005: Stagger classes
-- [ ] BUG-006: Chuva noturna sem estrelas
+- [ ] BUG-005: Stagger classes (baixa prioridade)
+- [ ] BUG-006: Chuva noturna sem estrelas (opcional/baixa prioridade)
 - [x] ~~BUG-007: Animações em SunTimes/RainDetails~~ ✅ **CORRIGIDO v22**
-- [ ] BUG-004: Névoa sem efeito de background
-- [ ] BUG-005: Stagger classes
-- [ ] BUG-006: Chuva noturna sem estrelas
-- [ ] BUG-007: Animações em SunTimes/RainDetails
 
 ### Multi-plataforma
 - [ ] Safe areas para iOS notch
@@ -562,9 +558,9 @@ src/
 - [ ] hail
 
 ### Animações
-- [ ] scale-in em modais
+- [x] ~~scale-in em modais~~ ✅ **CORRIGIDO v22** - DayDetailModal
 - [ ] Refresh feedback
-- [ ] shimmer em skeleton
+- [x] ~~shimmer em skeleton~~ ✅ **CORRIGIDO v22** - WeatherSkeleton
 - [ ] glow-pulse em ícones noturnos
 
 ---
@@ -577,17 +573,20 @@ src/
 
 ## 📜 Changelog
 
-### v22 (31/01/2026) - Mascote Nublado + Bugs Visuais
+### v22 (31/01/2026) - Mascote Nublado + Bugs Visuais + Animações
 - ✅ **Nova mascote `LeleCloudyDay`**: Lele olhando pro céu nublado, pensativa
 - ✅ **BUG-002 CORRIGIDO**: Sol agora se posiciona melhor em telas xl/2xl
 - ✅ **BUG-003 CORRIGIDO**: MoonGlow mais visível (opacidades aumentadas, tamanho maior)
 - ✅ **BUG-004 CORRIGIDO**: Novo componente `FogEffect` para clima com névoa
 - ✅ **BUG-007 CORRIGIDO**: SunTimesCard e RainDetails com animação de entrada
+- ✅ **Animação scale-in**: DayDetailModal com animação de entrada
+- ✅ **Shimmer skeleton**: WeatherSkeleton com efeito shimmer melhorado
 
 **Arquivos modificados:**
 - `src/components/LeleMascot.tsx` - Nova mascote `LeleCloudyDay`, atualizado `leleMascotMapDay`
 - `src/components/WeatherBackground.tsx` - MoonGlow, SunRays responsivo, novo FogEffect
-- `src/components/WeatherComponents.tsx` - Animações em SunTimesCard e RainDetails
+- `src/components/WeatherComponents.tsx` - Animações em cards, shimmer no skeleton
+- `src/components/Modals.tsx` - Animação scale-in no DayDetailModal
 
 ---
 
