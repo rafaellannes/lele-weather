@@ -45,7 +45,11 @@ function App() {
     setShowSearch(false);
     setSearchQuery('');
     setSearchResults([]);
-    await fetchByCoords(location.lat, location.lon);
+    // Passa o nome da localização para preservar o nome escolhido pelo usuário
+    await fetchByCoords(location.lat, location.lon, { 
+      name: location.name, 
+      state: location.state 
+    });
   }, [fetchByCoords]);
 
   const handleUseCurrentLocation = useCallback(() => {

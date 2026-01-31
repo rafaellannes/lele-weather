@@ -6,8 +6,13 @@ const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1';
 
 /**
  * Busca dados do clima por coordenadas
+ * @param locationName - Nome opcional da localização (quando vem da busca)
  */
-export async function fetchWeatherByCoords(lat: number, lon: number): Promise<WeatherData> {
+export async function fetchWeatherByCoords(
+  lat: number, 
+  lon: number, 
+  locationName?: { name: string; state?: string }
+): Promise<WeatherData> {
   const params = new URLSearchParams({
     latitude: lat.toString(),
     longitude: lon.toString(),
@@ -48,7 +53,11 @@ export async function fetchWeatherByCoords(lat: number, lon: number): Promise<We
   }
 
   const data = await response.json();
-  const location = await getLocationByCoords(lat, lon);
+  
+  // Se veio nome da busca, usar ele. Senão, fazer reverse geocoding
+  const location = locationName 
+    ? { name: locationName.name, state: locationName.state || '' }
+    : await getLocationByCoords(lat, lon);
   
   return formatWeatherData(data, location, lat, lon);
 }

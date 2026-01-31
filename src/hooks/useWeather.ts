@@ -15,12 +15,16 @@ export function useWeather() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchByCoords = useCallback(async (lat: number, lon: number) => {
+  const fetchByCoords = useCallback(async (
+    lat: number, 
+    lon: number, 
+    locationName?: { name: string; state?: string }
+  ) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const data = await fetchWeatherByCoords(lat, lon);
+      const data = await fetchWeatherByCoords(lat, lon, locationName);
       setWeather(data);
       saveToCache(data);
       saveCoordsToCache(lat, lon);
