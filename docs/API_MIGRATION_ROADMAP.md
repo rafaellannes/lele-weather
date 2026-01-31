@@ -149,6 +149,168 @@ const geocodes = {
 // API para buscar geocode por nome
 // https://servicodados.ibge.gov.br/api/v1/localidades/municipios/{nome}
 ```
+
+---
+
+## ⚠️ ANÁLISE DE COMPATIBILIDADE: INMET vs Funcionalidades Atuais
+
+### Dados que o App PRECISA (Open-Meteo atual)
+
+| Dado | Usado para | Open-Meteo | INMET Estação | INMET Previsão |
+|------|------------|------------|---------------|----------------|
+| **CURRENT (Agora)** |
+| `temperature_2m` | Temp atual | ✅ | ✅ TEM_INS | ✅ |
+| `relative_humidity_2m` | Umidade | ✅ | ✅ UMD_INS | ✅ |
+| `apparent_temperature` | Sensação | ✅ | ⚠️ Calcular | ⚠️ Calcular |
+| `precipitation` | Chuva atual | ✅ | ✅ CHUVA | ❌ |
+| `weather_code` | Ícone/Condição | ✅ | ⚠️ Estimar | ⚠️ Texto |
+| `pressure_msl` | Pressão | ✅ | ✅ PRE_INS | ❌ |
+| `wind_speed_10m` | Vento | ✅ | ✅ VEN_VEL | ✅ |
+| `wind_direction_10m` | Dir. vento | ✅ | ✅ VEN_DIR | ✅ |
+| **HOURLY (Hora a hora)** |
+| `temperature_2m[]` | Previsão horária | ✅ | ❌ | ⚠️ Não horário |
+| `precipitation_probability[]` | % chuva hora | ✅ | ❌ | ❌ |
+| `weather_code[]` | Ícone hora | ✅ | ❌ | ❌ |
+| **DAILY (Dias)** |
+| `temperature_2m_max` | Máxima | ✅ | ⚠️ Calcular | ✅ |
+| `temperature_2m_min` | Mínima | ✅ | ⚠️ Calcular | ✅ |
+| `weather_code` | Ícone dia | ✅ | ❌ | ⚠️ Texto |
+| `sunrise` | Nascer sol | ✅ | ❌ | ❌ |
+| `sunset` | Pôr sol | ✅ | ❌ | ❌ |
+| `precipitation_probability_max` | % chuva dia | ✅ | ❌ | ⚠️ Texto |
+| `precipitation_sum` | Volume chuva | ✅ | ✅ Acumulado | ❌ |
+
+### Legenda
+- ✅ Disponível diretamente
+- ⚠️ Precisa calcular/converter
+- ❌ Não disponível
+
+---
+
+## 🔴 PROBLEMAS IDENTIFICADOS COM INMET
+
+### 1. NÃO TEM Previsão Horária
+```
+INMET:
+- Estações: dados de AGORA (leitura do sensor)
+- Previsão: apenas períodos (manhã, tarde, noite)
+
+App precisa:
+- Próximas 24 horas, hora a hora
+- Probabilidade de chuva por hora
+```
+
+### 2. NÃO TEM Sunrise/Sunset
+```
+INMET não fornece horários de nascer/pôr do sol
+Precisa calcular usando algoritmo astronômico (lat/lon + data)
+```
+
+### 3. Weather Code é TEXTO
+```
+Open-Meteo: código numérico (0-99) padronizado WMO
+INMET Previsão: texto em português ("Pancadas de chuva isoladas")
+
+Precisa fazer mapping de texto → código
+```
+
+### 4. API Instável
+```
+Durante testes, a API do INMET retornou:
+- 403 Forbidden em alguns endpoints
+- Timeouts frequentes
+- Sem documentação oficial
+```
+
+---
+
+## ✅ CONCLUSÃO: Estratégia Híbrida é OBRIGATÓRIA
+
+### Por que não pode usar SÓ INMET:
+
+| Funcionalidade | Sem INMET funciona? | Solução |
+|----------------|---------------------|---------|
+| Temp atual | Funciona menos precisa | INMET melhora |
+| Previsão horária | ❌ NÃO FUNCIONA | Manter Open-Meteo |
+| Previsão diária | Funciona parcial | Híbrido |
+| Sunrise/Sunset | ❌ NÃO FUNCIONA | Calcular ou Open-Meteo |
+| % Chuva por hora | ❌ NÃO FUNCIONA | Manter Open-Meteo |
+| Alertas oficiais | ❌ Não tem | INMET adiciona! |
+
+### Estratégia Final Recomendada
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              ESTRATÉGIA HÍBRIDA FINAL                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  BRASIL:                                                     │
+│  ├─ Temperatura ATUAL → INMET (mais preciso)                │
+│  ├─ Previsão HORÁRIA → Open-Meteo (INMET não tem)           │
+│  ├─ Previsão DIÁRIA → Mesclar ambos                         │
+│  ├─ Sunrise/Sunset → Open-Meteo ou calcular                 │
+│  └─ ALERTAS → INMET RSS (funcionalidade NOVA!)              │
+│                                                              │
+│  RESTO DO MUNDO:                                             │
+│  └─ Tudo → Open-Meteo (como está hoje)                      │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Implementação Híbrida Corrigida
+
+```typescript
+// src/services/weather/hybridBrazil.ts
+
+export async function fetchWeatherBrazil(lat: number, lon: number): Promise<WeatherData> {
+  // Buscar de AMBAS as APIs em paralelo
+  const [inmetData, openMeteoData] = await Promise.all([
+    fetchFromINMET(lat, lon).catch(() => null), // INMET pode falhar
+    fetchFromOpenMeteo(lat, lon) // Open-Meteo como base
+  ]);
+  
+  // Se INMET funcionou, mesclar dados
+  if (inmetData) {
+    return {
+      ...openMeteoData, // Base: previsão horária, sunrise/sunset
+      current: {
+        ...openMeteoData.current,
+        // Sobrescrever com dados REAIS do INMET
+        temp: inmetData.temperature,
+        humidity: inmetData.humidity,
+        pressure: inmetData.pressure,
+        wind: inmetData.windSpeed,
+        windDirection: inmetData.windDirection,
+        // Manter do Open-Meteo (INMET não tem)
+        feelsLike: openMeteoData.current.feelsLike,
+        icon: openMeteoData.current.icon,
+        isNight: openMeteoData.current.isNight
+      },
+      // Adicionar alertas do INMET (funcionalidade NOVA!)
+      alerts: inmetData.alerts || [],
+      // Flag para mostrar fonte
+      dataSource: 'INMET + Open-Meteo'
+    };
+  }
+  
+  // Se INMET falhou, usar só Open-Meteo
+  return {
+    ...openMeteoData,
+    dataSource: 'Open-Meteo'
+  };
+}
+```
+
+### Benefícios da Abordagem Híbrida
+
+| Aspecto | Antes (só Open-Meteo) | Depois (Híbrido) |
+|---------|----------------------|------------------|
+| Temp atual Brasil | Modelo estimado | Sensor REAL ✅ |
+| Previsão horária | ✅ Funciona | ✅ Funciona |
+| Sunrise/Sunset | ✅ Funciona | ✅ Funciona |
+| Alertas oficiais | ❌ Não tem | ✅ INMET RSS |
+| Custo | R$ 0 | R$ 0 |
+| Complexidade | Baixa | Média |
 ```
 
 ---
