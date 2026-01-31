@@ -4,7 +4,7 @@ import App from './App'
 import './index.css'
 
 // Limpa Service Workers e caches antigos (uma vez)
-const CACHE_CLEARED = localStorage.getItem('cache_cleared_v3')
+const CACHE_CLEARED = localStorage.getItem('cache_cleared_v4')
 if (!CACHE_CLEARED) {
   // Desregistra todos os SWs
   if ('serviceWorker' in navigator) {
@@ -16,7 +16,7 @@ if (!CACHE_CLEARED) {
   if ('caches' in window) {
     caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
   }
-  localStorage.setItem('cache_cleared_v3', 'true')
+  localStorage.setItem('cache_cleared_v4', 'true')
   // Reload para aplicar
   setTimeout(() => window.location.reload(), 100)
 }
