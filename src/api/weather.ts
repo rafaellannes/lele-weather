@@ -167,8 +167,36 @@ function formatWeatherData(
   const hourly = data.hourly || {};
   const daily = data.daily || {};
 
-  const now = new Date();
-  const currentHour = now.getHours();
+  // Usar o horário da API (já está no timezone da cidade pesquisada)
+  // Encontrar o índice da hora atual baseado no tempo atual da API
+  const currentTimeFromApi = current.time || hourly.time?.[0];
+  const currentHourLocal = currentTimeFromApi ? extractHour(currentTimeFromApi) : new Date().getHours();
+  
+  // Encontrar o índice correto na array hourly baseado no horário atual
+  let currentHourIndex = 0;
+  if (hourly.time && hourly.time.length > 0) {
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    
+    // Procurar o índice mais próximo do horário atual no timezone da cidade
+    for (let i = 0; i < hourly.time.length; i++) {
+      const hourTime = hourly.time[i];
+      if (hourTime && hourTime.includes(currentDate)) {
+        const hourValue = extractHour(hourTime);
+        if (hourValue === currentHourLocal) {
+          currentHourIndex = i;
+          break;
+        }
+      }
+    }
+    
+    // Se não encontrou, usar o índice baseado na hora
+    if (currentHourIndex === 0 && currentHourLocal > 0) {
+      currentHourIndex = currentHourLocal;
+    }
+  }
+  
+  const currentHour = currentHourIndex;
   
   // Pegar sunrise/sunset do primeiro dia para referência
   const todaySunrise = daily.sunrise?.[0] || '06:00';
@@ -290,8 +318,8 @@ function formatWeatherData(
     ? (location.state ? `${location.name}, ${location.state}` : location.name)
     : `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
 
-  // Verificar se agora é noite para o ícone atual
-  const currentIsNight = isNightHour(currentHour, todaySunrise, todaySunset);
+  // Verificar se agora é noite para o ícone atual (usar hora local da cidade)
+  const currentIsNight = isNightHour(currentHourLocal, todaySunrise, todaySunset);
 
   return {
     location: locationDisplay,
@@ -327,7 +355,7 @@ function formatWeatherData(
     rainHourly,
     rainHourlyByDay,
     daily: dailyForecast,
-    updatedAt: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    updatedAt: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
   };
 }
 
