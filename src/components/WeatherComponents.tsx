@@ -14,6 +14,11 @@ const WeatherIcons: Record<WeatherIconType, React.ReactNode> = {
       </g>
     </svg>
   ),
+  clearNight: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" fill="#FCD34D"/>
+    </svg>
+  ),
   cloudy: (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
       <path d="M19.5 16.5a4.5 4.5 0 00-4.5-4.5 4.48 4.48 0 00-3.17 1.31A5 5 0 004 15a5 5 0 005 5h9.5a4.5 4.5 0 001-8.5z" fill="#94A3B8"/>
@@ -35,6 +40,12 @@ const WeatherIcons: Record<WeatherIconType, React.ReactNode> = {
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
       <circle cx="8" cy="8" r="4" fill="#FFD93D"/>
       <path d="M20 15a4 4 0 00-4-4 4 4 0 00-2.5.88A3.5 3.5 0 007.5 14 3.5 3.5 0 008 21h10.5a4 4 0 001.5-6z" fill="#94A3B8"/>
+    </svg>
+  ),
+  partlyCloudyNight: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M12 3a5 5 0 00-1.09 9.88A4 4 0 008 9a4 4 0 00.68 2.23A3.5 3.5 0 007.5 14 3.5 3.5 0 008 21h10.5a4 4 0 001.5-6 4 4 0 00-4-4 4 4 0 00-2.07.58A5 5 0 0012 3z" fill="#94A3B8"/>
+      <path d="M14 6.5A4.5 4.5 0 119.5 2 3.5 3.5 0 0014 6.5z" fill="#FCD34D"/>
     </svg>
   ),
   drizzle: (
@@ -578,7 +589,9 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
 function getConditionFromIcon(icon: WeatherIconType): string {
   const conditions: Record<WeatherIconType, string> = {
     sunny: 'Ensolarado',
+    clearNight: 'Noite limpa',
     partlyCloudy: 'Parcialmente nublado',
+    partlyCloudyNight: 'Parcialmente nublado',
     cloudy: 'Nublado',
     rainy: 'Chuva',
     drizzle: 'Garoa',

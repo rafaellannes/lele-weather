@@ -1,9 +1,11 @@
 export type WeatherIconType = 
   | 'sunny'
+  | 'clearNight'
   | 'cloudy'
   | 'rainy'
   | 'thunderstorm'
   | 'partlyCloudy'
+  | 'partlyCloudyNight'
   | 'drizzle'
   | 'snowy'
   | 'foggy';

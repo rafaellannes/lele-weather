@@ -9,7 +9,9 @@ import { WeatherIcon } from './Icons';
 function getConditionFromIcon(icon: WeatherIconType): string {
   const conditions: Record<WeatherIconType, string> = {
     sunny: 'Ensolarado',
+    clearNight: 'Noite limpa',
     partlyCloudy: 'Parcialmente nublado',
+    partlyCloudyNight: 'Parcialmente nublado',
     cloudy: 'Nublado',
     rainy: 'Chuva',
     drizzle: 'Garoa',

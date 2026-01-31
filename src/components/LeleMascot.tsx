@@ -489,10 +489,12 @@ const LeleFoggy: React.FC<{ className?: string }> = ({ className }) => (
 // Mapa de componentes
 const leleMascotMap: Record<WeatherIconType, React.FC<{ className?: string }>> = {
     sunny: LeleSunny,
+    clearNight: LeleSunny,  // Usa o mesmo mascote ensolarado para noite limpa
     cloudy: LeleCloudy,
     rainy: LeleRainy,
     thunderstorm: LeleThunderstorm,
     partlyCloudy: LelePartlyCloudy,
+    partlyCloudyNight: LelePartlyCloudy,  // Usa parcialmente nublado para noite
     drizzle: LeleDrizzle,
     snowy: LeleSnowy,
     foggy: LeleFoggy,

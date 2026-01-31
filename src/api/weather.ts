@@ -367,9 +367,9 @@ function isNightHour(hour: number, sunrise?: string, sunset?: string): boolean {
 function mapWeatherCode(code: number, isNight: boolean = false): WeatherIconType {
   // Para céu limpo ou predominantemente limpo, diferenciar dia/noite
   if (code === 0 || code === 1) {
-    return isNight ? 'partlyCloudy' : 'sunny'; // partlyCloudy tem visual mais "noturno"
+    return isNight ? 'clearNight' : 'sunny';
   }
-  if (code === 2) return 'partlyCloudy';
+  if (code === 2) return isNight ? 'partlyCloudyNight' : 'partlyCloudy';
   if (code === 3) return 'cloudy';
   if (code >= 45 && code <= 48) return 'foggy';
   if (code >= 51 && code <= 57) return 'drizzle';
