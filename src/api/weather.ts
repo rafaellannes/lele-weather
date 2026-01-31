@@ -1,9 +1,16 @@
-// API Service - Chama Open-Meteo diretamente do navegador (GRATUITO!)
+/**
+ * API Service - Open-Meteo (GRATUITO!)
+ * Usa API padrão para dados atuais e ECMWF para previsão diária (mais preciso)
+ */
 import { WeatherData, WeatherIconType, LocationResult } from '../types/weather';
-
-const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast';
-const ECMWF_URL = 'https://api.open-meteo.com/v1/ecmwf';
-const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1';
+import { 
+  API_CONFIG, 
+  FORECAST_CONFIG, 
+  SEARCH_CONFIG, 
+  CACHE_CONFIG,
+  getTimezone,
+  WeatherApiError 
+} from '../config/constants';
 
 /**
  * Busca dados do clima por coordenadas
@@ -15,6 +22,8 @@ export async function fetchWeatherByCoords(
   lon: number, 
   locationName?: { name: string; state?: string }
 ): Promise<WeatherData> {
+  const timezone = getTimezone();
+  
   // Busca dados atuais da API padrão
   const currentParams = new URLSearchParams({
     latitude: lat.toString(),
@@ -29,7 +38,7 @@ export async function fetchWeatherByCoords(
       'wind_speed_10m',
       'wind_direction_10m'
     ].join(','),
-    timezone: 'America/Sao_Paulo'
+    timezone
   });
 
   // Busca previsão do ECMWF (mais preciso para dias futuros)
@@ -51,53 +60,72 @@ export async function fetchWeatherByCoords(
       'precipitation_probability_max',
       'precipitation_sum'
     ].join(','),
-    timezone: 'America/Sao_Paulo',
-    forecast_days: '10'
+    timezone,
+    forecast_days: FORECAST_CONFIG.DAYS.toString()
   });
 
-  // Busca em paralelo
-  const [currentResponse, forecastResponse] = await Promise.all([
-    fetch(`${OPEN_METEO_URL}?${currentParams}`),
-    fetch(`${ECMWF_URL}?${forecastParams}`)
-  ]);
-  
-  if (!currentResponse.ok || !forecastResponse.ok) {
-    throw new Error('Falha ao buscar dados do clima');
-  }
+  try {
+    // Busca em paralelo
+    const [currentResponse, forecastResponse] = await Promise.all([
+      fetch(`${API_CONFIG.OPEN_METEO}?${currentParams}`),
+      fetch(`${API_CONFIG.ECMWF}?${forecastParams}`)
+    ]);
+    
+    if (!currentResponse.ok) {
+      throw new WeatherApiError(
+        `Erro ao buscar dados atuais: ${currentResponse.status}`,
+        currentResponse.status
+      );
+    }
+    
+    if (!forecastResponse.ok) {
+      throw new WeatherApiError(
+        `Erro ao buscar previsão: ${forecastResponse.status}`,
+        forecastResponse.status
+      );
+    }
 
-  const currentData = await currentResponse.json();
-  const forecastData = await forecastResponse.json();
-  
-  // Combina os dados
-  const data = {
-    ...forecastData,
-    current: currentData.current,
-    current_units: currentData.current_units
-  };
-  
-  // Se veio nome da busca, usar ele. Senão, fazer reverse geocoding
-  const location = locationName 
-    ? { name: locationName.name, state: locationName.state || '' }
-    : await getLocationByCoords(lat, lon);
-  
-  return formatWeatherData(data, location, lat, lon);
+    const currentData = await currentResponse.json();
+    const forecastData = await forecastResponse.json();
+    
+    // Combina os dados
+    const data = {
+      ...forecastData,
+      current: currentData.current,
+      current_units: currentData.current_units
+    };
+    
+    // Se veio nome da busca, usar ele. Senão, fazer reverse geocoding
+    const location = locationName 
+      ? { name: locationName.name, state: locationName.state || '' }
+      : await getLocationByCoords(lat, lon);
+    
+    return formatWeatherData(data, location, lat, lon);
+  } catch (error) {
+    if (error instanceof WeatherApiError) {
+      throw error;
+    }
+    throw new WeatherApiError(
+      error instanceof Error ? error.message : 'Erro desconhecido ao buscar clima'
+    );
+  }
 }
 
 /**
  * Busca localização por nome da cidade
  */
 export async function searchCities(query: string): Promise<LocationResult[]> {
-  if (query.length < 2) return [];
+  if (query.length < SEARCH_CONFIG.MIN_LENGTH) return [];
 
   const params = new URLSearchParams({
     name: query,
-    count: '5',
+    count: SEARCH_CONFIG.MAX_RESULTS.toString(),
     language: 'pt',
     format: 'json'
   });
 
   try {
-    const response = await fetch(`${GEOCODING_URL}/search?${params}`);
+    const response = await fetch(`${API_CONFIG.GEOCODING}/search?${params}`);
     
     if (!response.ok) return [];
 
@@ -142,9 +170,9 @@ function formatWeatherData(
   const now = new Date();
   const currentHour = now.getHours();
 
-  // Previsão horária (próximas 12 horas)
+  // Previsão horária (próximas horas conforme config)
   const hourlyForecast = [];
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < FORECAST_CONFIG.HOURS; i++) {
     const index = currentHour + i;
     if (index >= (hourly.time?.length || 0)) break;
 
@@ -156,7 +184,7 @@ function formatWeatherData(
     });
   }
 
-  // Previsão horária por dia (para o modal de detalhes) - 12 horas
+  // Previsão horária por dia (para o modal de detalhes)
   const hourlyByDay: Array<Array<{ time: string; temp: number; rain: number; icon: any }>> = [];
   const daysCount = (daily.time || []).length;
   
@@ -178,12 +206,12 @@ function formatWeatherData(
     }
     
     // Mostrar até 12 horas
-    hourlyByDay.push(dayHourly.slice(0, 12));
+    hourlyByDay.push(dayHourly.slice(0, FORECAST_CONFIG.HOURS));
   }
 
-  // Previsão de chuva por hora (12 horas)
+  // Previsão de chuva por hora
   const rainHourly = [];
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < FORECAST_CONFIG.HOURS; i++) {
     const index = currentHour + i;
     if (index >= (hourly.time?.length || 0)) break;
 
@@ -194,7 +222,7 @@ function formatWeatherData(
     });
   }
 
-  // Chuva hora a hora por dia (para o modal de detalhes) - 12 horas
+  // Chuva hora a hora por dia (para o modal de detalhes)
   const rainHourlyByDay: Array<Array<{ time: string; amount: number; chance: number }>> = [];
   
   for (let dayIndex = 0; dayIndex < daysCount; dayIndex++) {
@@ -213,7 +241,7 @@ function formatWeatherData(
       });
     }
     
-    rainHourlyByDay.push(dayRainHourly.slice(0, 12));
+    rainHourlyByDay.push(dayRainHourly.slice(0, FORECAST_CONFIG.HOURS));
   }
 
   // Previsão diária
@@ -427,7 +455,7 @@ function getRainDescription(hourly: any, currentHour: number): string {
 // Salvar no localStorage para cache offline
 export function saveToCache(data: WeatherData): void {
   try {
-    localStorage.setItem('leleweather_cache', JSON.stringify({
+    localStorage.setItem(CACHE_CONFIG.KEYS.WEATHER, JSON.stringify({
       data,
       timestamp: Date.now()
     }));
@@ -438,13 +466,13 @@ export function saveToCache(data: WeatherData): void {
 
 export function loadFromCache(): WeatherData | null {
   try {
-    const cached = localStorage.getItem('leleweather_cache');
+    const cached = localStorage.getItem(CACHE_CONFIG.KEYS.WEATHER);
     if (!cached) return null;
     
     const { data, timestamp } = JSON.parse(cached);
     
-    // Cache válido por 30 minutos
-    if (Date.now() - timestamp > 30 * 60 * 1000) {
+    // Cache válido conforme configuração
+    if (Date.now() - timestamp > CACHE_CONFIG.DURATION_MS) {
       return null;
     }
     
@@ -460,7 +488,7 @@ export function saveCoordsToCache(
   locationName?: { name: string; state?: string }
 ): void {
   try {
-    localStorage.setItem('leleweather_coords', JSON.stringify({ 
+    localStorage.setItem(CACHE_CONFIG.KEYS.COORDS, JSON.stringify({ 
       lat, 
       lon,
       locationName: locationName || null
@@ -476,7 +504,7 @@ export function loadCoordsFromCache(): {
   locationName?: { name: string; state?: string } | null 
 } | null {
   try {
-    const cached = localStorage.getItem('leleweather_coords');
+    const cached = localStorage.getItem(CACHE_CONFIG.KEYS.COORDS);
     if (!cached) return null;
     return JSON.parse(cached);
   } catch {

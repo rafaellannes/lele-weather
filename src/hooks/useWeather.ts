@@ -8,6 +8,11 @@ import {
   saveCoordsToCache,
   loadCoordsFromCache
 } from '../api/weather';
+import { 
+  GEOLOCATION_CONFIG, 
+  UPDATE_CONFIG,
+  GeolocationError 
+} from '../config/constants';
 
 // Hook principal do clima
 export function useWeather() {
@@ -69,22 +74,24 @@ export function useWeather() {
       },
       (err) => {
         console.error('Geolocation error:', err);
-        setError('Não foi possível obter sua localização');
+        
+        // Erro específico de geolocalização
+        const geoError = new GeolocationError(err.message, err.code);
+        setError(geoError.message);
         
         // Tentar carregar coords do cache
         const cachedCoords = loadCoordsFromCache();
         if (cachedCoords) {
           fetchByCoords(cachedCoords.lat, cachedCoords.lon, cachedCoords.locationName || undefined);
         } else {
-          // Fallback: Nova Iguaçu, RJ
-          fetchByCoords(-22.7556, -43.4603);
+          // Fallback: coordenadas padrão da config
+          fetchByCoords(
+            GEOLOCATION_CONFIG.FALLBACK.LAT, 
+            GEOLOCATION_CONFIG.FALLBACK.LON
+          );
         }
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000
-      }
+      GEOLOCATION_CONFIG.OPTIONS
     );
   }, [fetchByCoords]);
 
@@ -112,11 +119,11 @@ export function useWeather() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-refresh a cada 10 minutos
+  // Auto-refresh conforme configuração
   useEffect(() => {
     if (!weather) return;
     
-    const interval = setInterval(refresh, 10 * 60 * 1000);
+    const interval = setInterval(refresh, UPDATE_CONFIG.AUTO_REFRESH_MS);
     return () => clearInterval(interval);
   }, [weather, refresh]);
 

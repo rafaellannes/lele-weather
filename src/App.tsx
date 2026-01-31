@@ -11,11 +11,12 @@ import {
   SunTimesCard,
   RainDetails,
   WeatherSkeleton,
-  InstallPrompt,
   DayDetailModal
 } from './components/WeatherComponents';
+import { InstallPrompt } from './components/Modals';
 import { LocationResult, WeatherIconType } from './types/weather';
 import { searchCities } from './api/weather';
+import { SEARCH_CONFIG } from './config/constants';
 
 // Função para determinar a classe de fundo baseada no clima
 function getWeatherBackground(icon: WeatherIconType | undefined, isNight: boolean): string {
@@ -57,11 +58,11 @@ function App() {
   const [showDayDetail, setShowDayDetail] = useState(false);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
-  const debouncedQuery = useDebounce(searchQuery, 300);
+  const debouncedQuery = useDebounce(searchQuery, SEARCH_CONFIG.DEBOUNCE_MS);
 
   // Buscar cidades quando o query mudar
   useEffect(() => {
-    if (debouncedQuery.length < 2) {
+    if (debouncedQuery.length < SEARCH_CONFIG.MIN_LENGTH) {
       setSearchResults([]);
       return;
     }
@@ -120,20 +121,34 @@ function App() {
     <div className={`min-h-screen weather-bg-transition ${backgroundClass}`}>
       {/* Offline Banner */}
       {!isOnline && (
-        <div className="bg-amber-500 text-black text-center py-2 text-sm sticky top-0 z-50">
+        <div 
+          className="bg-amber-500 text-black text-center py-2 text-sm sticky top-0 z-50"
+          role="alert"
+          aria-live="polite"
+        >
           Você está offline. Mostrando dados em cache.
         </div>
       )}
 
       {/* Error Banner */}
       {error && (
-        <div className="bg-red-500/90 text-white text-center py-2 text-sm sticky top-0 z-50">
+        <div 
+          className="bg-red-500/90 text-white text-center py-2 text-sm sticky top-0 z-50"
+          role="alert"
+          aria-live="assertive"
+        >
           {error}
-          <button onClick={refresh} className="ml-2 underline">Tentar novamente</button>
+          <button 
+            onClick={refresh} 
+            className="ml-2 underline focus:ring-2 focus:ring-white rounded"
+            aria-label="Tentar carregar dados novamente"
+          >
+            Tentar novamente
+          </button>
         </div>
       )}
 
-      <div className="max-w-md mx-auto pb-20">
+      <main className="max-w-md mx-auto pb-20">
         <Header
           address={weather?.address || 'Buscando localização...'}
           onSearch={() => setShowSearch(true)}
@@ -158,12 +173,13 @@ function App() {
             <RainDetails rainHourly={weather.rainHourly} volume={weather.rainForecast.volume} />
 
             {/* Footer */}
-            <div className="text-center py-6">
+            <footer className="text-center py-6">
               <p className="text-white/40 text-xs">Atualizado às {weather.updatedAt}</p>
               <button
                 onClick={refresh}
                 disabled={isLoading}
-                className="text-pink-400 text-sm mt-2 hover:underline disabled:opacity-50"
+                className="text-pink-400 text-sm mt-2 hover:underline disabled:opacity-50 focus:ring-2 focus:ring-pink-400 rounded px-2"
+                aria-label={isLoading ? 'Atualizando dados...' : 'Atualizar dados do clima'}
               >
                 {isLoading ? 'Atualizando...' : 'Atualizar dados'}
               </button>
@@ -173,35 +189,43 @@ function App() {
               <p className="text-pink-400/60 text-xs mt-2">
                 Feito com ❤️ para Lele
               </p>
-            </div>
+            </footer>
           </>
         ) : (
-          <div className="text-center py-20">
+          <div className="text-center py-20" role="status">
             <p className="text-white/60">Não foi possível carregar os dados</p>
             <button
               onClick={getCurrentLocation}
-              className="mt-4 bg-pink-500 text-white px-4 py-2 rounded-lg"
+              className="mt-4 bg-pink-500 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 focus:ring-offset-slate-900"
+              aria-label="Usar minha localização para obter clima"
             >
               Usar minha localização
             </button>
           </div>
         )}
-      </div>
+      </main>
 
       {/* Search Modal */}
       {showSearch && (
-        <div className="fixed inset-0 bg-slate-900 z-50 overflow-y-auto">
+        <div 
+          className="fixed inset-0 bg-slate-900 z-50 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="search-title"
+        >
           <div className="max-w-md mx-auto p-4 min-h-screen">
             <div className="flex items-center gap-3 mb-4">
               <button
                 type="button"
                 onClick={() => setShowSearch(false)}
-                className="text-white/70 hover:text-white p-2 -ml-2"
+                className="text-white/70 hover:text-white p-2 -ml-2 focus:ring-2 focus:ring-white/30 rounded-lg"
+                aria-label="Fechar busca"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
+              <label id="search-title" className="sr-only">Buscar cidade</label>
               <input
                 type="text"
                 value={searchQuery}
@@ -209,6 +233,8 @@ function App() {
                 placeholder="Buscar cidade..."
                 className="flex-1 bg-slate-800 text-white rounded-full px-4 py-3 outline-none focus:ring-2 focus:ring-pink-500 border-none"
                 autoFocus
+                aria-label="Buscar cidade"
+                aria-describedby={searchResults.length > 0 ? 'search-results-count' : undefined}
               />
             </div>
 
@@ -216,9 +242,10 @@ function App() {
             <button
               type="button"
               onClick={handleUseCurrentLocation}
-              className="w-full flex items-center gap-3 p-4 hover:bg-white/5 rounded-xl transition-colors"
+              className="w-full flex items-center gap-3 p-4 hover:bg-white/5 rounded-xl transition-colors focus:bg-white/5 focus:outline-none"
+              aria-label="Usar minha localização atual"
             >
-              <div className="w-10 h-10 bg-pink-500/20 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-pink-500/20 rounded-full flex items-center justify-center" aria-hidden="true">
                 <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -229,23 +256,27 @@ function App() {
 
             {/* Loading */}
             {isSearching && (
-              <div className="text-center py-8">
+              <div className="text-center py-8" role="status" aria-label="Buscando cidades...">
                 <div className="inline-block w-6 h-6 border-2 border-pink-400 border-t-transparent rounded-full animate-spin" />
               </div>
             )}
 
             {/* Results */}
             {searchResults.length > 0 && (
-              <div className="mt-4">
-                <p className="text-white/40 text-sm px-4 mb-2">Resultados</p>
+              <div className="mt-4" role="listbox" aria-label="Resultados da busca">
+                <p id="search-results-count" className="text-white/40 text-sm px-4 mb-2">
+                  {searchResults.length} resultado{searchResults.length > 1 ? 's' : ''} encontrado{searchResults.length > 1 ? 's' : ''}
+                </p>
                 {searchResults.map((result, i) => (
                   <button
                     type="button"
                     key={`${result.lat}-${result.lon}-${i}`}
                     onClick={() => handleSelectLocation(result)}
-                    className="w-full flex items-center gap-3 p-4 hover:bg-white/5 rounded-xl transition-colors text-left"
+                    className="w-full flex items-center gap-3 p-4 hover:bg-white/5 rounded-xl transition-colors text-left focus:bg-white/5 focus:outline-none"
+                    role="option"
+                    aria-selected="false"
                   >
-                    <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center flex-shrink-0" aria-hidden="true">
                       <svg className="w-5 h-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       </svg>
