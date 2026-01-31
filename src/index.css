@@ -80,6 +80,17 @@
   scrollbar-width: none;
 }
 
+/* Drag scroll behavior */
+.cursor-grab {
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cursor-grab:active,
+.active\:cursor-grabbing:active {
+  cursor: grabbing;
+}
+
 /* Pull to refresh indicator */
 .ptr-element {
   position: absolute;

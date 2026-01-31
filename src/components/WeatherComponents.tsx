@@ -283,10 +283,10 @@ export const RainDetails: React.FC<{ rainHourly: RainHourly[]; volume: number }>
         <p className="text-white/60 text-sm">Volume total hoje</p>
         <p className="text-white text-4xl font-light">{volume} mm</p>
       </div>
-      <div className="flex items-end gap-2 h-20">
+      <div className="flex items-end gap-2 h-20 overflow-x-auto pb-2 scrollbar-hide cursor-grab active:cursor-grabbing">
         {rainHourly.map((hour, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center group">
-            <div className="w-full bg-blue-400/60 rounded-t transition-all group-hover:bg-blue-400" style={{ height: `${Math.max(hour.amount * 15, 4)}px` }}/>
+          <div key={i} className="flex-shrink-0 flex flex-col items-center min-w-[50px] group">
+            <div className="w-8 bg-blue-400/60 rounded-t transition-all group-hover:bg-blue-400" style={{ height: `${Math.max(hour.amount * 15, 4)}px` }}/>
             <span className="text-white/50 text-xs mt-2">{hour.chance}%</span>
             <span className="text-white/40 text-[10px]">{hour.time}</span>
           </div>
@@ -405,7 +405,7 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
 
         {/* Seletor de dias horizontal */}
         <div className="px-2 py-3 border-b border-white/10">
-          <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide cursor-grab active:cursor-grabbing">
             {days.map((day, i) => (
               <button
                 key={i}
@@ -461,7 +461,7 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
             <div className="mb-6">
               <h3 className="text-white/80 text-base mb-3">Previsão do tempo de hora em hora</h3>
               <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
-                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide cursor-grab active:cursor-grabbing">
                   {selectedHourly.map((hour, i) => (
                     <div key={i} className="flex flex-col items-center min-w-[55px]">
                       <span className="text-white text-lg font-light">{hour.temp}°</span>
@@ -550,7 +550,7 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
                   <p className="text-white/60 text-sm">Volume no dia</p>
                   <p className="text-white text-3xl font-light">{Math.round(dayRainVolume * 10) / 10} mm</p>
                 </div>
-                <div className="flex items-end gap-2 h-20 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex items-end gap-2 h-20 overflow-x-auto pb-2 scrollbar-hide cursor-grab active:cursor-grabbing">
                   {selectedRainHourly.map((hour, i) => (
                     <div key={i} className="flex-shrink-0 flex flex-col items-center min-w-[50px] group">
                       <span className="text-white/50 text-xs mb-1">
