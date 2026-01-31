@@ -8,7 +8,6 @@ import {
   FORECAST_CONFIG, 
   SEARCH_CONFIG, 
   CACHE_CONFIG,
-  getTimezone,
   WeatherApiError 
 } from '../config/constants';
 
@@ -22,7 +21,8 @@ export async function fetchWeatherByCoords(
   lon: number, 
   locationName?: { name: string; state?: string }
 ): Promise<WeatherData> {
-  const timezone = getTimezone();
+  // Usar timezone=auto para que a API retorne no timezone LOCAL da cidade pesquisada
+  const timezone = 'auto';
   
   // Busca dados atuais da API padrão
   const currentParams = new URLSearchParams({
