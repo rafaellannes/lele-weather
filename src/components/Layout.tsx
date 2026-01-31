@@ -188,12 +188,12 @@ interface HourlyForecastSectionProps {
 export const HourlyForecastSection: React.FC<HourlyForecastSectionProps> = ({ children }) => (
   <section className="mb-6" aria-labelledby="hourly-forecast-heading">
     <h2 id="hourly-forecast-heading" className="text-lg font-semibold mb-3 flex items-center gap-2">
-      <span aria-hidden="true">⏰</span> Próximas 12 horas
+      <span aria-hidden="true">⏰</span> Próximas 24 horas
     </h2>
     <div 
       className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
       role="list"
-      aria-label="Previsão das próximas 12 horas"
+      aria-label="Previsão das próximas 24 horas"
     >
       {children}
     </div>

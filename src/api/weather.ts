@@ -205,7 +205,7 @@ function formatWeatherData(
       });
     }
     
-    // Mostrar até 12 horas
+    // Mostrar conforme FORECAST_CONFIG.HOURS
     hourlyByDay.push(dayHourly.slice(0, FORECAST_CONFIG.HOURS));
   }
 

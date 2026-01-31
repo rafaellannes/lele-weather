@@ -12,8 +12,8 @@ export const API_CONFIG = {
 // Configurações de previsão
 export const FORECAST_CONFIG = {
   DAYS: 10,
-  HOURS: 12,
-  HOURS_PER_DAY: 24,
+  HOURS: 24,          // Previsão horária na tela principal
+  HOURS_PER_DAY: 24,  // Máximo de horas por dia no modal
 } as const;
 
 // Configurações de busca

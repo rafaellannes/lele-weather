@@ -19,7 +19,7 @@
 - 👧🏽 **Mascote Lele** - Reage ao clima atual (sol, chuva, tempestade, dormindo à noite...)
 - 🎨 **Background dinâmico** - Muda conforme o clima e horário do dia
 - 🌡️ **Temperatura atual** com sensação térmica
-- 📊 **Previsão hora a hora** (12 horas)
+- 📊 **Previsão hora a hora** (24 horas)
 - 📅 **Previsão para 10 dias** com modal detalhado estilo Google Weather
 - 🌧️ **Volume de chuva** e probabilidade por hora
 - 🌅 **Nascer e pôr do sol** com visualização animada
