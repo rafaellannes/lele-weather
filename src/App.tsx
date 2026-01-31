@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useWeather, usePwaInstall, useOnlineStatus, useDebounce } from './hooks/useWeather';
 import { LeleMascotAnimated } from './components/LeleMascot';
 import {
@@ -13,8 +13,34 @@ import {
   WeatherSkeleton,
   InstallPrompt
 } from './components/WeatherComponents';
-import { LocationResult } from './types/weather';
+import { LocationResult, WeatherIconType } from './types/weather';
 import { searchCities } from './api/weather';
+
+// Função para determinar a classe de fundo baseada no clima
+function getWeatherBackground(icon: WeatherIconType | undefined, isNight: boolean): string {
+  if (!icon) return 'weather-bg-default';
+  
+  const nightSuffix = isNight ? '-night' : '';
+  
+  switch (icon) {
+    case 'sunny':
+    case 'partlyCloudy':
+      return `weather-bg-sunny${nightSuffix}`;
+    case 'cloudy':
+      return `weather-bg-cloudy${nightSuffix}`;
+    case 'rainy':
+    case 'drizzle':
+      return `weather-bg-rainy${nightSuffix}`;
+    case 'thunderstorm':
+      return 'weather-bg-thunderstorm';
+    case 'snowy':
+      return `weather-bg-snowy${nightSuffix}`;
+    case 'foggy':
+      return `weather-bg-foggy${nightSuffix}`;
+    default:
+      return 'weather-bg-default';
+  }
+}
 
 function App() {
   const { weather, isLoading, error, fetchByCoords, refresh, getCurrentLocation } = useWeather();
@@ -57,8 +83,30 @@ function App() {
     getCurrentLocation();
   }, [getCurrentLocation]);
 
+  // Determinar se é noite baseado no horário de nascer/pôr do sol
+  const isNight = useMemo(() => {
+    if (!weather?.sun) return false;
+    
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    // Parse sunrise/sunset (formato "HH:MM")
+    const [sunriseH, sunriseM] = weather.sun.sunrise.split(':').map(Number);
+    const [sunsetH, sunsetM] = weather.sun.sunset.split(':').map(Number);
+    
+    const sunriseMinutes = sunriseH * 60 + sunriseM;
+    const sunsetMinutes = sunsetH * 60 + sunsetM;
+    
+    return currentTime < sunriseMinutes || currentTime > sunsetMinutes;
+  }, [weather?.sun]);
+
+  // Classe de fundo dinâmico
+  const backgroundClass = useMemo(() => {
+    return getWeatherBackground(weather?.current?.icon, isNight);
+  }, [weather?.current?.icon, isNight]);
+
   return (
-    <div className="min-h-screen">
+    <div className={`min-h-screen weather-bg-transition ${backgroundClass}`}>
       {/* Offline Banner */}
       {!isOnline && (
         <div className="bg-amber-500 text-black text-center py-2 text-sm sticky top-0 z-50">

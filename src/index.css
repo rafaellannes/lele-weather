@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fundos dinâmicos baseados no clima */
+.weather-bg-sunny {
+  background: linear-gradient(180deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+}
+
+.weather-bg-sunny-night {
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+}
+
+.weather-bg-cloudy {
+  background: linear-gradient(180deg, #374151 0%, #4b5563 50%, #6b7280 100%);
+}
+
+.weather-bg-cloudy-night {
+  background: linear-gradient(180deg, #111827 0%, #1f2937 50%, #374151 100%);
+}
+
+.weather-bg-rainy {
+  background: linear-gradient(180deg, #1e3a5f 0%, #2d4a6f 50%, #3d5a80 100%);
+}
+
+.weather-bg-rainy-night {
+  background: linear-gradient(180deg, #0c1929 0%, #162033 50%, #1e3a5f 100%);
+}
+
+.weather-bg-thunderstorm {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.weather-bg-snowy {
+  background: linear-gradient(180deg, #e0e7ff 0%, #c7d2fe 50%, #a5b4fc 100%);
+}
+
+.weather-bg-snowy-night {
+  background: linear-gradient(180deg, #312e81 0%, #3730a3 50%, #4338ca 100%);
+}
+
+.weather-bg-foggy {
+  background: linear-gradient(180deg, #64748b 0%, #94a3b8 50%, #cbd5e1 100%);
+}
+
+.weather-bg-foggy-night {
+  background: linear-gradient(180deg, #1e293b 0%, #334155 50%, #475569 100%);
+}
+
+.weather-bg-default {
+  background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%);
+}
+
+/* Transição suave entre fundos */
+.weather-bg-transition {
+  transition: background 1s ease-in-out;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
