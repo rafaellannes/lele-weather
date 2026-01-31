@@ -334,18 +334,31 @@ function formatWeatherData(
 // Helpers
 
 /**
+ * Extrai a hora de uma string de tempo (ISO ou HH:MM)
+ */
+function extractHour(timeStr: string): number {
+  if (!timeStr) return 0;
+  
+  // Se contém 'T', é formato ISO (2026-01-31T06:30)
+  if (timeStr.includes('T')) {
+    const timePart = timeStr.split('T')[1];
+    return parseInt(timePart.split(':')[0], 10);
+  }
+  
+  // Senão é formato HH:MM
+  return parseInt(timeStr.split(':')[0], 10);
+}
+
+/**
  * Verifica se uma hora específica é noite
- * Considera noite: antes das 6h ou depois das 18h
- * Se tiver dados de sunrise/sunset, usa eles
+ * Considera noite: antes do nascer do sol ou depois do pôr do sol
  */
 function isNightHour(hour: number, sunrise?: string, sunset?: string): boolean {
-  if (sunrise && sunset) {
-    const sunriseHour = parseInt(sunrise.split(':')[0], 10);
-    const sunsetHour = parseInt(sunset.split(':')[0], 10);
-    return hour < sunriseHour || hour >= sunsetHour;
-  }
-  // Fallback: noite entre 18h e 6h
-  return hour < 6 || hour >= 18;
+  const sunriseHour = sunrise ? extractHour(sunrise) : 6;
+  const sunsetHour = sunset ? extractHour(sunset) : 18;
+  
+  // Noite é antes do nascer ou depois do pôr do sol
+  return hour < sunriseHour || hour >= sunsetHour;
 }
 
 /**
