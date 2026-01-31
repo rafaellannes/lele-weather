@@ -254,7 +254,7 @@ export const CurrentConditions: React.FC<{ data: WeatherCurrent }> = ({ data }) 
 
 // Sun Times
 export const SunTimesCard: React.FC<{ sun: SunTimes }> = ({ sun }) => (
-  <div className="px-4 mb-4">
+  <div className="px-4 mb-4 animate-slide-up stagger-4">
     <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
       <h3 className="text-white font-medium mb-4">Nascer e pôr do sol</h3>
       <div className="flex justify-between items-start mb-4">
@@ -289,7 +289,7 @@ export const SunTimesCard: React.FC<{ sun: SunTimes }> = ({ sun }) => (
 
 // Rain Details
 export const RainDetails: React.FC<{ rainHourly: RainHourly[]; volume: number }> = ({ rainHourly, volume }) => (
-  <div className="px-4 mb-4">
+  <div className="px-4 mb-4 animate-slide-up stagger-5">
     <h3 className="text-white/80 text-lg mb-3">Chuva por hora</h3>
     <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
       <div className="mb-4">

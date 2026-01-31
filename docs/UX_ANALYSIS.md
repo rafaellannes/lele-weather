@@ -1,7 +1,7 @@
 # 📊 Análise UX - LeleWeather
 
 ## Data: 31/01/2026
-## Versão: v20
+## Versão: v22
 ## Plataformas: Web Desktop, Web Mobile, PWA (iOS/Android)
 
 ---
@@ -28,7 +28,8 @@ O LeleWeather é uma PWA de clima que funciona em Web Desktop, Web Mobile e como
 - ✅ Sistema de gradientes dinâmicos por clima
 - ✅ Efeitos de partículas (estrelas, chuva, neve)
 - ✅ Animações CSS bem definidas
-- ✅ Diferenciação dia/noite
+- ✅ Diferenciação dia/noite (v21)
+- ✅ Mascotes diferenciadas por condição climática (v22)
 - ✅ Sol com raios animados
 - ✅ Funciona offline (Service Worker)
 - ✅ Responsivo (mobile-first)
@@ -528,8 +529,13 @@ src/
 ### Bugs Críticos
 - [x] ~~BUG-000: Ícones não diferenciam dia/noite~~ ✅ **CORRIGIDO v21** - Flag `isNight` independente
 - [x] ~~BUG-001: Precisão do cálculo dia/noite~~ ✅ **CORRIGIDO v21** - Função `isNightTime()` com minutos
-- [ ] BUG-002: Posição do sol em desktop wide
-- [ ] BUG-003: MoonGlow muito transparente
+- [x] ~~Mascote nublado mostra sol~~ ✅ **CORRIGIDO v22** - Nova `LeleCloudyDay` sem sol
+- [x] ~~BUG-002: Posição do sol em desktop wide~~ ✅ **CORRIGIDO v22** - Responsivo xl/2xl
+- [x] ~~BUG-003: MoonGlow muito transparente~~ ✅ **CORRIGIDO v22** - Aumentada visibilidade
+- [ ] BUG-004: Névoa sem efeito de background
+- [ ] BUG-005: Stagger classes
+- [ ] BUG-006: Chuva noturna sem estrelas
+- [x] ~~BUG-007: Animações em SunTimes/RainDetails~~ ✅ **CORRIGIDO v22**
 - [ ] BUG-004: Névoa sem efeito de background
 - [ ] BUG-005: Stagger classes
 - [ ] BUG-006: Chuva noturna sem estrelas
@@ -570,6 +576,19 @@ src/
 ---
 
 ## 📜 Changelog
+
+### v22 (31/01/2026) - Mascote Nublado + Bugs Visuais
+- ✅ **Nova mascote `LeleCloudyDay`**: Lele olhando pro céu nublado, pensativa
+- ✅ **BUG-002 CORRIGIDO**: Sol agora se posiciona melhor em telas xl/2xl
+- ✅ **BUG-003 CORRIGIDO**: MoonGlow mais visível (opacidades aumentadas, tamanho maior)
+- ✅ **BUG-007 CORRIGIDO**: SunTimesCard e RainDetails com animação de entrada
+
+**Arquivos modificados:**
+- `src/components/LeleMascot.tsx` - Nova mascote `LeleCloudyDay`, atualizado `leleMascotMapDay`
+- `src/components/WeatherBackground.tsx` - MoonGlow mais visível, SunRays responsivo
+- `src/components/WeatherComponents.tsx` - Animações em SunTimesCard e RainDetails
+
+---
 
 ### v21 (31/01/2026) - Correção Crítica Dia/Noite
 - ✅ **BUG-000 CORRIGIDO**: Adicionada flag `isNight` independente no `WeatherCurrent`

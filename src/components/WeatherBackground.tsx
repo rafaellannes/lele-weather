@@ -165,7 +165,7 @@ const Lightning: React.FC = () => {
 // Componente de raios de sol animados
 const SunRays: React.FC = () => {
   return (
-    <div className="absolute top-16 right-4 md:right-1/4 w-48 h-48 overflow-visible pointer-events-none">
+    <div className="absolute top-16 right-4 md:right-1/4 xl:right-1/3 2xl:right-[40%] w-48 h-48 overflow-visible pointer-events-none">
       {/* Halo de luz grande */}
       <div className="absolute -inset-8">
         <div className="absolute inset-0 bg-gradient-radial from-amber-300/30 via-orange-300/10 to-transparent rounded-full animate-pulse-slow" />
@@ -202,9 +202,9 @@ const SunRays: React.FC = () => {
 // Componente de lua com brilho
 const MoonGlow: React.FC = () => {
   return (
-    <div className="absolute top-4 right-4 w-20 h-20 overflow-hidden pointer-events-none">
-      <div className="absolute inset-0 bg-gradient-radial from-slate-300/20 via-slate-400/5 to-transparent rounded-full" />
-      <div className="absolute top-2 right-2 w-12 h-12 bg-gradient-to-br from-slate-200/30 to-slate-400/10 rounded-full" />
+    <div className="absolute top-4 right-4 w-24 h-24 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 bg-gradient-radial from-slate-200/40 via-slate-300/15 to-transparent rounded-full animate-pulse-slow" />
+      <div className="absolute top-2 right-2 w-14 h-14 bg-gradient-to-br from-slate-100/50 to-slate-300/20 rounded-full shadow-lg shadow-slate-200/20" />
     </div>
   );
 };
