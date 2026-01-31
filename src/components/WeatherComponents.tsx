@@ -363,6 +363,7 @@ interface DayDetailModalProps {
   selectedDayIndex: number;
   onSelectDay: (index: number) => void;
   hourlyByDay: HourlyForecast[][];
+  rainHourlyByDay: RainHourly[][];
   sun: SunTimes;
 }
 
@@ -373,12 +374,17 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
   selectedDayIndex,
   onSelectDay,
   hourlyByDay,
+  rainHourlyByDay,
   sun
 }) => {
   if (!isOpen) return null;
   
   const selectedDay = days[selectedDayIndex];
   const selectedHourly = hourlyByDay[selectedDayIndex] || [];
+  const selectedRainHourly = rainHourlyByDay[selectedDayIndex] || [];
+  
+  // Calcular volume de chuva do dia
+  const dayRainVolume = selectedRainHourly.reduce((sum, h) => sum + h.amount, 0);
   
   return (
     <div className="fixed inset-0 bg-slate-900 z-50 overflow-y-auto">
@@ -530,6 +536,34 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
                     </div>
                     <span className="text-white/50 text-sm">Pôr do sol</span>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Detalhes de chuva hora em hora */}
+          {selectedRainHourly.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-white/80 text-base mb-3">Detalhes de hora em hora</h3>
+              <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+                <div className="mb-4">
+                  <p className="text-white/60 text-sm">Volume no dia</p>
+                  <p className="text-white text-3xl font-light">{Math.round(dayRainVolume * 10) / 10} mm</p>
+                </div>
+                <div className="flex items-end gap-2 h-20 overflow-x-auto pb-2 scrollbar-hide">
+                  {selectedRainHourly.map((hour, i) => (
+                    <div key={i} className="flex-shrink-0 flex flex-col items-center min-w-[50px] group">
+                      <span className="text-white/50 text-xs mb-1">
+                        {hour.amount > 0 ? `${hour.amount.toFixed(1)}` : '< 0,25'}
+                      </span>
+                      <div 
+                        className="w-8 bg-blue-400/60 rounded-t transition-all group-hover:bg-blue-400" 
+                        style={{ height: `${Math.max(hour.amount * 20, 4)}px` }}
+                      />
+                      <span className="text-blue-400 text-xs mt-2">{hour.chance}%</span>
+                      <span className="text-white/40 text-[10px]">{hour.time}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

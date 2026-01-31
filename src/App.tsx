@@ -273,6 +273,7 @@ function App() {
           selectedDayIndex={selectedDayIndex}
           onSelectDay={setSelectedDayIndex}
           hourlyByDay={weather.hourlyByDay}
+          rainHourlyByDay={weather.rainHourlyByDay}
           sun={weather.sun}
         />
       )}

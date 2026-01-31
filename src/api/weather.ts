@@ -121,9 +121,9 @@ function formatWeatherData(
   const now = new Date();
   const currentHour = now.getHours();
 
-  // Previsão horária (próximas 8 horas)
+  // Previsão horária (próximas 12 horas)
   const hourlyForecast = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 12; i++) {
     const index = currentHour + i;
     if (index >= (hourly.time?.length || 0)) break;
 
@@ -135,7 +135,7 @@ function formatWeatherData(
     });
   }
 
-  // Previsão horária por dia (para o modal de detalhes)
+  // Previsão horária por dia (para o modal de detalhes) - 12 horas
   const hourlyByDay: Array<Array<{ time: string; temp: number; rain: number; icon: any }>> = [];
   const daysCount = (daily.time || []).length;
   
@@ -156,13 +156,13 @@ function formatWeatherData(
       });
     }
     
-    // Limitar a 8 horas para não ficar muito longo
-    hourlyByDay.push(dayHourly.slice(0, 8));
+    // Mostrar até 12 horas
+    hourlyByDay.push(dayHourly.slice(0, 12));
   }
 
-  // Previsão de chuva por hora
+  // Previsão de chuva por hora (12 horas)
   const rainHourly = [];
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 12; i++) {
     const index = currentHour + i;
     if (index >= (hourly.time?.length || 0)) break;
 
@@ -171,6 +171,28 @@ function formatWeatherData(
       amount: hourly.precipitation?.[index] || 0,
       chance: hourly.precipitation_probability?.[index] || 0
     });
+  }
+
+  // Chuva hora a hora por dia (para o modal de detalhes) - 12 horas
+  const rainHourlyByDay: Array<Array<{ time: string; amount: number; chance: number }>> = [];
+  
+  for (let dayIndex = 0; dayIndex < daysCount; dayIndex++) {
+    const dayRainHourly = [];
+    const startHour = dayIndex === 0 ? currentHour : 0;
+    const hoursToShow = dayIndex === 0 ? 24 - currentHour : 24;
+    
+    for (let h = 0; h < hoursToShow; h++) {
+      const hourIndex = (dayIndex * 24) + startHour + h;
+      if (hourIndex >= (hourly.time?.length || 0)) break;
+      
+      dayRainHourly.push({
+        time: formatTime(hourly.time[hourIndex]),
+        amount: hourly.precipitation?.[hourIndex] || 0,
+        chance: hourly.precipitation_probability?.[hourIndex] || 0
+      });
+    }
+    
+    rainHourlyByDay.push(dayRainHourly.slice(0, 12));
   }
 
   // Previsão diária
@@ -231,6 +253,7 @@ function formatWeatherData(
     hourly: hourlyForecast,
     hourlyByDay,
     rainHourly,
+    rainHourlyByDay,
     daily: dailyForecast,
     updatedAt: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
   };

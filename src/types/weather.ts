@@ -72,6 +72,7 @@ export interface WeatherData {
   hourly: HourlyForecast[];
   hourlyByDay: HourlyForecast[][]; // Previsão horária por dia (para o modal de detalhes)
   rainHourly: RainHourly[];
+  rainHourlyByDay: RainHourly[][]; // Chuva hora a hora por dia (para o modal de detalhes)
   daily: DailyForecast[];
   updatedAt: string;
 }
