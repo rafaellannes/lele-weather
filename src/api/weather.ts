@@ -1,13 +1,13 @@
 // API Service - Chama Open-Meteo diretamente do navegador (GRATUITO!)
 import { WeatherData, WeatherIconType, LocationResult } from '../types/weather';
 
-// API padrão para dados atuais, ECMWF para previsão
 const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast';
+const ECMWF_URL = 'https://api.open-meteo.com/v1/ecmwf';
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1';
 
 /**
  * Busca dados do clima por coordenadas
- * Usa modelo padrão (best_match) que combina dados de várias fontes
+ * Usa API padrão para current + ECMWF para previsão (mais preciso)
  * @param locationName - Nome opcional da localização (quando vem da busca)
  */
 export async function fetchWeatherByCoords(
@@ -15,7 +15,8 @@ export async function fetchWeatherByCoords(
   lon: number, 
   locationName?: { name: string; state?: string }
 ): Promise<WeatherData> {
-  const params = new URLSearchParams({
+  // Busca dados atuais da API padrão
+  const currentParams = new URLSearchParams({
     latitude: lat.toString(),
     longitude: lon.toString(),
     current: [
@@ -28,6 +29,13 @@ export async function fetchWeatherByCoords(
       'wind_speed_10m',
       'wind_direction_10m'
     ].join(','),
+    timezone: 'America/Sao_Paulo'
+  });
+
+  // Busca previsão do ECMWF (mais preciso para dias futuros)
+  const forecastParams = new URLSearchParams({
+    latitude: lat.toString(),
+    longitude: lon.toString(),
     hourly: [
       'temperature_2m',
       'precipitation_probability',
@@ -44,17 +52,28 @@ export async function fetchWeatherByCoords(
       'precipitation_sum'
     ].join(','),
     timezone: 'America/Sao_Paulo',
-    forecast_days: '10',
-    models: 'best_match'
+    forecast_days: '10'
   });
 
-  const response = await fetch(`${OPEN_METEO_URL}?${params}`);
+  // Busca em paralelo
+  const [currentResponse, forecastResponse] = await Promise.all([
+    fetch(`${OPEN_METEO_URL}?${currentParams}`),
+    fetch(`${ECMWF_URL}?${forecastParams}`)
+  ]);
   
-  if (!response.ok) {
+  if (!currentResponse.ok || !forecastResponse.ok) {
     throw new Error('Falha ao buscar dados do clima');
   }
 
-  const data = await response.json();
+  const currentData = await currentResponse.json();
+  const forecastData = await forecastResponse.json();
+  
+  // Combina os dados
+  const data = {
+    ...forecastData,
+    current: currentData.current,
+    current_units: currentData.current_units
+  };
   
   // Se veio nome da busca, usar ele. Senão, fazer reverse geocoding
   const location = locationName 
