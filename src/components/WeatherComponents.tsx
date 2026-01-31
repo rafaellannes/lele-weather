@@ -123,13 +123,13 @@ export const Header: React.FC<{ address: string; onSearch?: () => void }> = ({ a
 
 // Current Weather
 export const CurrentWeather: React.FC<{ data: WeatherCurrent }> = ({ data }) => (
-  <div className="px-4 py-6">
+  <div className="px-4 py-6 animate-fade-in">
     <span className="text-white/60 text-sm">Agora</span>
     <div className="flex items-start justify-between mt-1">
       <div className="flex items-start">
-        <span className="text-8xl font-light text-white tracking-tight">{data.temp}</span>
+        <span className="text-8xl font-light text-white tracking-tight animate-count-up">{data.temp}</span>
         <span className="text-3xl text-white/70 mt-2">°</span>
-        <div className="w-10 h-10 ml-2 mt-4">
+        <div className="w-10 h-10 ml-2 mt-4 animate-bounce-soft">
           <WeatherIcon type={data.icon} />
         </div>
       </div>
@@ -144,7 +144,7 @@ export const CurrentWeather: React.FC<{ data: WeatherCurrent }> = ({ data }) => 
 
 // Rain Forecast Card
 export const RainForecastCard: React.FC<{ forecast: RainForecast }> = ({ forecast }) => (
-  <div className="mx-4 mb-4">
+  <div className="mx-4 mb-4 animate-slide-up stagger-1">
     <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
       <h3 className="text-white font-medium mb-1">Previsão de chuva: {forecast.duration}</h3>
       <p className="text-white/60 text-sm mb-4">{forecast.description}</p>
@@ -160,12 +160,12 @@ export const RainForecastCard: React.FC<{ forecast: RainForecast }> = ({ forecas
 
 // Hourly Forecast
 export const HourlyForecastCard: React.FC<{ hours: HourlyForecast[] }> = ({ hours }) => (
-  <div className="px-4 mb-4">
+  <div className="px-4 mb-4 animate-slide-up stagger-2">
     <h3 className="text-white/80 text-lg mb-3">Previsão hora a hora</h3>
     <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
       <DragScrollContainer className="flex gap-4 pb-2">
         {hours.map((hour, i) => (
-          <div key={i} className="flex flex-col items-center min-w-[60px]">
+          <div key={i} className="flex flex-col items-center min-w-[60px] transition-transform hover:scale-105">
             <span className="text-white text-lg font-light">{hour.temp}°</span>
             <span className="text-blue-400 text-sm">{hour.rain}%</span>
             <div className="w-8 h-8 my-2"><WeatherIcon type={hour.icon} /></div>
@@ -182,7 +182,7 @@ export const DailyForecastCard: React.FC<{
   days: DailyForecast[];
   onDayClick?: (index: number) => void;
 }> = ({ days, onDayClick }) => (
-  <div className="px-4 mb-4">
+  <div className="px-4 mb-4 animate-slide-up stagger-3">
     <h3 className="text-white/80 text-lg mb-3">Próximos {days.length} dias</h3>
     <div className="bg-slate-800/50 backdrop-blur rounded-2xl overflow-hidden border border-white/5">
       {days.map((day, i) => (
@@ -190,7 +190,7 @@ export const DailyForecastCard: React.FC<{
           key={i}
           type="button"
           onClick={() => onDayClick?.(i)}
-          className={`w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors text-left ${i !== days.length - 1 ? 'border-b border-white/5' : ''}`}
+          className={`w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 active:bg-white/10 transition-all text-left ${i !== days.length - 1 ? 'border-b border-white/5' : ''}`}
         >
           <div className="flex-1">
             <span className="text-white">{day.day === "Hoje" ? "Hoje" : `${day.day}, ${day.dateFormatted}`}</span>
@@ -211,11 +211,11 @@ export const DailyForecastCard: React.FC<{
 
 // Current Conditions
 export const CurrentConditions: React.FC<{ data: WeatherCurrent }> = ({ data }) => (
-  <div className="px-4 mb-4">
+  <div className="px-4 mb-4 animate-slide-up stagger-4">
     <h3 className="text-white/80 text-lg mb-3">Condições atuais</h3>
     <div className="grid grid-cols-2 gap-3">
       {/* Wind */}
-      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5 transition-transform hover:scale-[1.02]">
         <span className="text-white/60 text-sm">Vento</span>
         <div className="flex items-end gap-2 mt-2">
           <span className="text-white text-3xl font-light">{data.wind}</span>
@@ -224,7 +224,7 @@ export const CurrentConditions: React.FC<{ data: WeatherCurrent }> = ({ data }) 
         <p className="text-white/50 text-sm mt-1">Do {data.windDirection.toLowerCase()}</p>
       </div>
       {/* Humidity */}
-      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5 transition-transform hover:scale-[1.02]">
         <span className="text-white/60 text-sm">Umidade</span>
         <div className="flex items-end gap-1 mt-2">
           <span className="text-white text-3xl font-light">{data.humidity}</span>
@@ -233,7 +233,7 @@ export const CurrentConditions: React.FC<{ data: WeatherCurrent }> = ({ data }) 
         <p className="text-white/50 text-sm mt-1">Ponto de orvalho {data.dewPoint}°</p>
       </div>
       {/* UV Index */}
-      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5 transition-transform hover:scale-[1.02]">
         <span className="text-white/60 text-sm">Índice UV</span>
         <div className="flex items-end gap-2 mt-2">
           <span className="text-white text-3xl font-light">{data.uvIndex}</span>
@@ -241,7 +241,7 @@ export const CurrentConditions: React.FC<{ data: WeatherCurrent }> = ({ data }) 
         <p className="text-white/50 text-sm mt-1">{data.uvIndex <= 2 ? 'Baixo' : data.uvIndex <= 5 ? 'Moderado' : 'Alto'}</p>
       </div>
       {/* Pressure */}
-      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+      <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5 transition-transform hover:scale-[1.02]">
         <span className="text-white/60 text-sm">Pressão</span>
         <div className="flex items-end gap-1 mt-2">
           <span className="text-white text-3xl font-light">{data.pressure}</span>

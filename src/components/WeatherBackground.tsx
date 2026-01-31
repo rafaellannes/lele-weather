@@ -161,16 +161,44 @@ const Lightning: React.FC = () => {
   );
 };
 
-// Componente de raios de sol
+// Componente de raios de sol animados
 const SunRays: React.FC = () => {
   return (
-    <div className="absolute top-0 right-0 w-64 h-64 overflow-hidden pointer-events-none opacity-30">
-      <div className="absolute -top-32 -right-32 w-64 h-64 bg-gradient-radial from-amber-400/30 via-amber-400/10 to-transparent rounded-full animate-pulse-slow" />
+    <div className="absolute top-0 right-0 w-80 h-80 overflow-hidden pointer-events-none">
+      {/* Halo de luz */}
+      <div className="absolute -top-20 -right-20 w-64 h-64">
+        <div className="absolute inset-0 bg-gradient-radial from-amber-300/40 via-orange-300/20 to-transparent rounded-full animate-pulse-slow" />
+      </div>
+      
+      {/* Sol central */}
+      <div className="absolute top-8 right-8 w-16 h-16">
+        <div className="absolute inset-0 bg-gradient-radial from-yellow-200 via-amber-300 to-orange-400 rounded-full shadow-lg shadow-amber-400/50" />
+        <div className="absolute inset-1 bg-gradient-radial from-yellow-100 via-yellow-200 to-amber-300 rounded-full" />
+      </div>
+      
+      {/* Raios girando */}
+      <div className="absolute top-0 right-0 w-48 h-48 animate-spin-slow">
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute top-1/2 left-1/2 w-1 h-16 bg-gradient-to-t from-amber-400/60 via-yellow-300/40 to-transparent origin-bottom"
+            style={{
+              transform: `translateX(-50%) rotate(${i * 30}deg)`,
+              opacity: i % 2 === 0 ? 0.6 : 0.3
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Brilhos flutuantes */}
+      <div className="absolute top-16 right-32 w-2 h-2 bg-yellow-200 rounded-full animate-float-1 opacity-60" />
+      <div className="absolute top-32 right-16 w-1.5 h-1.5 bg-amber-200 rounded-full animate-float-2 opacity-50" />
+      <div className="absolute top-24 right-24 w-1 h-1 bg-yellow-100 rounded-full animate-float-3 opacity-70" />
     </div>
   );
 };
 
-// Componente de lua
+// Componente de lua com brilho
 const MoonGlow: React.FC = () => {
   return (
     <div className="absolute top-4 right-4 w-20 h-20 overflow-hidden pointer-events-none">

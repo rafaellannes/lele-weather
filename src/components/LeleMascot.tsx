@@ -527,17 +527,8 @@ export const LeleMascot: React.FC<LeleMascotProps> = ({
 // Componente com animação
 export const LeleMascotAnimated: React.FC<LeleMascotProps> = (props) => {
     return (
-        <div className="animate-bounce-slow">
+        <div className="animate-breathe">
             <LeleMascot {...props} />
-            <style>{`
-                @keyframes bounce-slow {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-10px); }
-                }
-                .animate-bounce-slow {
-                    animation: bounce-slow 3s ease-in-out infinite;
-                }
-            `}</style>
         </div>
     );
 };
