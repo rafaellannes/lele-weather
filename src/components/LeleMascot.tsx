@@ -265,6 +265,69 @@ const LeleCloudy: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
+// Lele Nublado de Dia - Olhando pro céu pensativa
+const LeleCloudyDay: React.FC<{ className?: string }> = ({ className }) => (
+    <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Nuvens grandes cobrindo o céu */}
+        <ellipse cx="60" cy="30" rx="40" ry="22" fill="#94A3B8"/>
+        <ellipse cx="140" cy="35" rx="45" ry="25" fill="#94A3B8"/>
+        <circle cx="25" cy="38" r="18" fill="#94A3B8"/>
+        <circle cx="100" cy="25" r="20" fill="#CBD5E1"/>
+        <circle cx="175" cy="40" r="16" fill="#94A3B8"/>
+        
+        {/* Cabelo cacheado grande e volumoso */}
+        <ellipse cx="100" cy="95" rx="55" ry="50" fill={HAIR_COLOR}/>
+        {/* Cachos laterais caídos - esquerda */}
+        <ellipse cx="48" cy="100" rx="18" ry="25" fill={HAIR_COLOR}/>
+        <ellipse cx="45" cy="125" rx="15" ry="20" fill={HAIR_COLOR}/>
+        <ellipse cx="50" cy="145" rx="12" ry="15" fill={HAIR_HIGHLIGHT}/>
+        {/* Cachos laterais caídos - direita */}
+        <ellipse cx="152" cy="100" rx="18" ry="25" fill={HAIR_COLOR}/>
+        <ellipse cx="155" cy="125" rx="15" ry="20" fill={HAIR_COLOR}/>
+        <ellipse cx="150" cy="145" rx="12" ry="15" fill={HAIR_HIGHLIGHT}/>
+        {/* Cachos no topo */}
+        <ellipse cx="70" cy="58" rx="16" ry="14" fill={HAIR_COLOR}/>
+        <ellipse cx="100" cy="50" rx="18" ry="14" fill={HAIR_COLOR}/>
+        <ellipse cx="130" cy="58" rx="16" ry="14" fill={HAIR_COLOR}/>
+        <ellipse cx="65" cy="65" rx="8" ry="6" fill={HAIR_HIGHLIGHT}/>
+        <ellipse cx="135" cy="65" rx="8" ry="6" fill={HAIR_HIGHLIGHT}/>
+        
+        {/* Rosto */}
+        <ellipse cx="100" cy="113" rx="36" ry="38" fill={SKIN_COLOR}/>
+        
+        {/* Bochechas */}
+        <ellipse cx="73" cy="123" rx="7" ry="4" fill={CHEEK_COLOR} opacity="0.5"/>
+        <ellipse cx="127" cy="123" rx="7" ry="4" fill={CHEEK_COLOR} opacity="0.5"/>
+        
+        {/* Olhos olhando pra cima (pro céu) */}
+        <ellipse cx="85" cy="108" rx="6" ry="7" fill="white"/>
+        <ellipse cx="115" cy="108" rx="6" ry="7" fill="white"/>
+        <circle cx="86" cy="105" r="4" fill={EYE_COLOR}/>
+        <circle cx="116" cy="105" r="4" fill={EYE_COLOR}/>
+        <circle cx="85" cy="103" r="1.5" fill="white"/>
+        <circle cx="115" cy="103" r="1.5" fill="white"/>
+        
+        {/* Sobrancelhas levantadas (curiosa) */}
+        <path d="M 78 98 Q 85 95 92 98" stroke={HAIR_COLOR} strokeWidth="2" fill="none" strokeLinecap="round"/>
+        <path d="M 108 98 Q 115 95 122 98" stroke={HAIR_COLOR} strokeWidth="2" fill="none" strokeLinecap="round"/>
+        
+        {/* Boca pequena pensativa - "hmm" */}
+        <ellipse cx="100" cy="132" rx="5" ry="4" fill="#E88B8B"/>
+        
+        {/* Corpo */}
+        <path d="M 70 150 Q 60 170 55 200 L 145 200 Q 140 170 130 150 Z" fill={DRESS_PRIMARY}/>
+        
+        {/* Mão no queixo pensando */}
+        <ellipse cx="130" cy="135" rx="8" ry="7" fill={SKIN_COLOR}/>
+        
+        {/* Pensamento "será que chove?" */}
+        <circle cx="155" cy="95" r="4" fill="#E2E8F0"/>
+        <circle cx="165" cy="85" r="6" fill="#E2E8F0"/>
+        <ellipse cx="178" cy="70" rx="12" ry="10" fill="#E2E8F0"/>
+        <text x="170" y="73" fill="#64748B" fontSize="8" fontWeight="bold">?</text>
+    </svg>
+);
+
 // Lele Parcialmente Nublado - Normal/contente
 const LelePartlyCloudy: React.FC<{ className?: string }> = ({ className }) => (
     <svg viewBox="0 0 200 200" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -491,10 +554,10 @@ const LeleFoggy: React.FC<{ className?: string }> = ({ className }) => (
 const leleMascotMapDay: Record<WeatherIconType, React.FC<{ className?: string }>> = {
     sunny: LeleSunny,
     clearNight: LeleSunny,
-    cloudy: LelePartlyCloudy,      // De dia, nublado mostra Lele relaxada (não dormindo)
+    cloudy: LeleCloudyDay,         // Nublado de dia: Lele olhando pro céu cinza
     rainy: LeleRainy,
     thunderstorm: LeleThunderstorm,
-    partlyCloudy: LelePartlyCloudy,
+    partlyCloudy: LelePartlyCloudy, // Parcialmente nublado: sol + nuvem
     partlyCloudyNight: LelePartlyCloudy,
     drizzle: LeleDrizzle,
     snowy: LeleSnowy,
