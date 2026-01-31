@@ -1,12 +1,13 @@
 // API Service - Chama Open-Meteo diretamente do navegador (GRATUITO!)
 import { WeatherData, WeatherIconType, LocationResult } from '../types/weather';
 
-// Usando modelo ECMWF (Centro Europeu) - mais preciso
-const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/ecmwf';
+// API padrão para dados atuais, ECMWF para previsão
+const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/forecast';
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1';
 
 /**
  * Busca dados do clima por coordenadas
+ * Usa modelo padrão (best_match) que combina dados de várias fontes
  * @param locationName - Nome opcional da localização (quando vem da busca)
  */
 export async function fetchWeatherByCoords(
@@ -43,7 +44,8 @@ export async function fetchWeatherByCoords(
       'precipitation_sum'
     ].join(','),
     timezone: 'America/Sao_Paulo',
-    forecast_days: '10'
+    forecast_days: '10',
+    models: 'best_match'
   });
 
   const response = await fetch(`${OPEN_METEO_URL}?${params}`);

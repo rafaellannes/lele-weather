@@ -12,7 +12,7 @@
     <!-- FORÇA LIMPEZA DE CACHE EM PWA -->
     <script>
       (function() {
-        var v = 'v5';
+        var v = 'v6';
         if (localStorage.getItem('pwa_version') !== v) {
           if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(regs) {
