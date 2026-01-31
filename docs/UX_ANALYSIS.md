@@ -287,7 +287,7 @@ function isNightTime(currentTime: string, sunrise: string, sunset: string): bool
 | Touch scroll | ✅ | Nativo do browser |
 | Touch targets | ✅ | Botões >= 44px |
 | Viewport meta | ✅ | `user-scalable=no` |
-| Safe areas | ⚠️ | Não usa `env(safe-area-inset-*)` |
+| Safe areas | ✅ | Usa `env(safe-area-inset-*)` no index.html |
 | Pull to refresh | ⚠️ | CSS definido mas não implementado |
 
 ### PWA (iOS/Android)
@@ -538,9 +538,9 @@ src/
 - [x] ~~BUG-007: Animações em SunTimes/RainDetails~~ ✅ **CORRIGIDO v22**
 
 ### Multi-plataforma
-- [ ] Safe areas para iOS notch
+- [x] ~~Safe areas para iOS notch~~ ✅ **JÁ IMPLEMENTADO** - index.html
 - [ ] Pull to refresh real
-- [ ] Focus states para teclado
+- [ ] Focus states para teclado (parcialmente implementado - tem focus:ring nos botões)
 - [ ] Performance em low-end devices
 - [ ] prefers-reduced-motion
 
