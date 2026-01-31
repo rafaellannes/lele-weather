@@ -96,48 +96,12 @@ export async function searchCities(query: string): Promise<LocationResult[]> {
 
 /**
  * Reverse geocoding - coordenadas para nome do local
- * Busca cidades conhecidas próximas às coordenadas
+ * Quando usa GPS, mostra apenas "Sua localização"
+ * (O nome correto vem da busca quando o usuário seleciona uma cidade)
  */
-async function getLocationByCoords(lat: number, lon: number): Promise<{ name: string; state: string } | null> {
-  // Lista de cidades brasileiras conhecidas com coordenadas aproximadas
-  const knownCities = [
-    { name: 'Nova Iguaçu', state: 'RJ', lat: -22.7556, lon: -43.4603 },
-    { name: 'Rio de Janeiro', state: 'RJ', lat: -22.9068, lon: -43.1729 },
-    { name: 'São Paulo', state: 'SP', lat: -23.5505, lon: -46.6333 },
-    { name: 'Belo Horizonte', state: 'MG', lat: -19.9167, lon: -43.9345 },
-    { name: 'Brasília', state: 'DF', lat: -15.7975, lon: -47.8919 },
-    { name: 'Salvador', state: 'BA', lat: -12.9714, lon: -38.5014 },
-    { name: 'Curitiba', state: 'PR', lat: -25.4284, lon: -49.2733 },
-    { name: 'Fortaleza', state: 'CE', lat: -3.7172, lon: -38.5433 },
-    { name: 'Recife', state: 'PE', lat: -8.0476, lon: -34.8770 },
-    { name: 'Porto Alegre', state: 'RS', lat: -30.0346, lon: -51.2177 },
-    { name: 'Manaus', state: 'AM', lat: -3.1190, lon: -60.0217 },
-    { name: 'Belém', state: 'PA', lat: -1.4558, lon: -48.4902 },
-    { name: 'Goiânia', state: 'GO', lat: -16.6869, lon: -49.2648 },
-    { name: 'Campinas', state: 'SP', lat: -22.9099, lon: -47.0626 },
-    { name: 'Niterói', state: 'RJ', lat: -22.8833, lon: -43.1036 },
-    { name: 'Duque de Caxias', state: 'RJ', lat: -22.7858, lon: -43.3116 },
-    { name: 'São Gonçalo', state: 'RJ', lat: -22.8268, lon: -43.0634 },
-  ];
-
-  // Encontrar cidade mais próxima (distância euclidiana simples)
-  let closest = null;
-  let minDist = Infinity;
-
-  for (const city of knownCities) {
-    const dist = Math.sqrt(Math.pow(lat - city.lat, 2) + Math.pow(lon - city.lon, 2));
-    if (dist < minDist) {
-      minDist = dist;
-      closest = city;
-    }
-  }
-
-  // Se a cidade mais próxima estiver a menos de ~50km (0.5 graus), usar ela
-  if (closest && minDist < 0.5) {
-    return { name: closest.name, state: closest.state };
-  }
-
-  // Caso contrário, retornar localização genérica
+async function getLocationByCoords(_lat: number, _lon: number): Promise<{ name: string; state: string } | null> {
+  // Quando usa GPS, não temos o nome da cidade
+  // O usuário pode buscar manualmente se quiser ver o nome
   return { name: 'Sua localização', state: '' };
 }
 
