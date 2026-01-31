@@ -9,6 +9,27 @@
     <meta name="apple-mobile-web-app-title" content="LeleWeather" />
     <meta name="description" content="LeleWeather - App de clima com a mascote Lele" />
     
+    <!-- FORÇA LIMPEZA DE CACHE EM PWA -->
+    <script>
+      (function() {
+        var v = 'v5';
+        if (localStorage.getItem('pwa_version') !== v) {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              regs.forEach(function(r) { r.unregister(); });
+            });
+          }
+          if ('caches' in window) {
+            caches.keys().then(function(keys) {
+              keys.forEach(function(k) { caches.delete(k); });
+            });
+          }
+          localStorage.setItem('pwa_version', v);
+          setTimeout(function() { location.reload(true); }, 200);
+        }
+      })();
+    </script>
+    
     <link rel="icon" type="image/png" href="/icons/icon-32.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     
