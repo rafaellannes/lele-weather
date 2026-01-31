@@ -135,6 +135,31 @@ function formatWeatherData(
     });
   }
 
+  // Previsão horária por dia (para o modal de detalhes)
+  const hourlyByDay: Array<Array<{ time: string; temp: number; rain: number; icon: any }>> = [];
+  const daysCount = (daily.time || []).length;
+  
+  for (let dayIndex = 0; dayIndex < daysCount; dayIndex++) {
+    const dayHourly = [];
+    const startHour = dayIndex === 0 ? currentHour : 0; // Hoje começa da hora atual
+    const hoursToShow = dayIndex === 0 ? 24 - currentHour : 24; // Quantas horas mostrar
+    
+    for (let h = 0; h < hoursToShow; h++) {
+      const hourIndex = (dayIndex * 24) + startHour + h;
+      if (hourIndex >= (hourly.time?.length || 0)) break;
+      
+      dayHourly.push({
+        time: formatTime(hourly.time[hourIndex]),
+        temp: Math.round(hourly.temperature_2m?.[hourIndex] || 0),
+        rain: hourly.precipitation_probability?.[hourIndex] || 0,
+        icon: mapWeatherCode(hourly.weather_code?.[hourIndex] || 0)
+      });
+    }
+    
+    // Limitar a 8 horas para não ficar muito longo
+    hourlyByDay.push(dayHourly.slice(0, 8));
+  }
+
   // Previsão de chuva por hora
   const rainHourly = [];
   for (let i = 0; i < 8; i++) {
@@ -204,6 +229,7 @@ function formatWeatherData(
       dusk: addMinutes(daily.sunset?.[0] || '18:00', 24)
     },
     hourly: hourlyForecast,
+    hourlyByDay,
     rainHourly,
     daily: dailyForecast,
     updatedAt: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })

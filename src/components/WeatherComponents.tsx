@@ -165,12 +165,20 @@ export const HourlyForecastCard: React.FC<{ hours: HourlyForecast[] }> = ({ hour
 );
 
 // Daily Forecast
-export const DailyForecastCard: React.FC<{ days: DailyForecast[] }> = ({ days }) => (
+export const DailyForecastCard: React.FC<{ 
+  days: DailyForecast[];
+  onDayClick?: (index: number) => void;
+}> = ({ days, onDayClick }) => (
   <div className="px-4 mb-4">
     <h3 className="text-white/80 text-lg mb-3">Próximos {days.length} dias</h3>
     <div className="bg-slate-800/50 backdrop-blur rounded-2xl overflow-hidden border border-white/5">
       {days.map((day, i) => (
-        <div key={i} className={`flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors ${i !== days.length - 1 ? 'border-b border-white/5' : ''}`}>
+        <button
+          key={i}
+          type="button"
+          onClick={() => onDayClick?.(i)}
+          className={`w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors text-left ${i !== days.length - 1 ? 'border-b border-white/5' : ''}`}
+        >
           <div className="flex-1">
             <span className="text-white">{day.day === "Hoje" ? "Hoje" : `${day.day}, ${day.dateFormatted}`}</span>
           </div>
@@ -182,7 +190,7 @@ export const DailyForecastCard: React.FC<{ days: DailyForecast[] }> = ({ days })
             <span className="text-white">{day.high}°</span>
             <span className="text-white/50">/{day.low}°</span>
           </div>
-        </div>
+        </button>
       ))}
     </div>
   </div>
@@ -346,3 +354,232 @@ export const InstallPrompt: React.FC<{ onInstall: () => void; onDismiss: () => v
     </div>
   </div>
 );
+
+// Day Detail Modal - Similar ao Google Weather
+interface DayDetailModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  days: DailyForecast[];
+  selectedDayIndex: number;
+  onSelectDay: (index: number) => void;
+  hourlyByDay: HourlyForecast[][];
+  sun: SunTimes;
+}
+
+export const DayDetailModal: React.FC<DayDetailModalProps> = ({
+  isOpen,
+  onClose,
+  days,
+  selectedDayIndex,
+  onSelectDay,
+  hourlyByDay,
+  sun
+}) => {
+  if (!isOpen) return null;
+  
+  const selectedDay = days[selectedDayIndex];
+  const selectedHourly = hourlyByDay[selectedDayIndex] || [];
+  
+  return (
+    <div className="fixed inset-0 bg-slate-900 z-50 overflow-y-auto">
+      <div className="max-w-md mx-auto min-h-screen">
+        {/* Header com seta voltar e título */}
+        <div className="flex items-center px-4 py-3 sticky top-0 bg-slate-900/95 backdrop-blur-lg z-10 border-b border-white/10">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-white/70 hover:text-white p-2 -ml-2"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <h1 className="text-white text-lg ml-2">Previsão do tempo para {days.length} dia(s)</h1>
+        </div>
+
+        {/* Seletor de dias horizontal */}
+        <div className="px-2 py-3 border-b border-white/10">
+          <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
+            {days.map((day, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => onSelectDay(i)}
+                className={`flex flex-col items-center min-w-[70px] px-3 py-2 rounded-xl transition-all ${
+                  selectedDayIndex === i 
+                    ? 'bg-blue-500/20 border border-blue-400/50' 
+                    : 'hover:bg-white/5'
+                }`}
+              >
+                <span className={`text-sm font-medium ${selectedDayIndex === i ? 'text-blue-400' : 'text-white/70'}`}>
+                  {day.day === 'Hoje' ? 'Hoje' : day.day.substring(0, 3) + '.'}
+                </span>
+                <div className="w-8 h-8 my-1">
+                  <WeatherIcon type={day.icon} />
+                </div>
+                <span className={`text-xs ${selectedDayIndex === i ? 'text-white' : 'text-white/60'}`}>
+                  {day.high}°/{day.low}°
+                </span>
+              </button>
+            ))}
+          </div>
+          {/* Indicador de seleção */}
+          <div className="flex justify-start px-1 mt-1">
+            <div 
+              className="h-1 bg-blue-400 rounded-full transition-all duration-300"
+              style={{ 
+                width: `${100 / days.length}%`,
+                marginLeft: `${(selectedDayIndex * 100) / days.length}%`
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Conteúdo do dia selecionado */}
+        <div className="p-4">
+          {/* Temperatura e condição */}
+          <div className="mb-6">
+            <span className="text-white/60 text-sm">{selectedDay.day === 'Hoje' ? 'Hoje' : selectedDay.day + ', ' + selectedDay.dateFormatted}</span>
+            <div className="flex items-start mt-2">
+              <span className="text-6xl font-light text-white">{selectedDay.high}°</span>
+              <span className="text-4xl text-white/50 font-light">/{selectedDay.low}°</span>
+              <div className="w-12 h-12 ml-3 mt-1">
+                <WeatherIcon type={selectedDay.icon} />
+              </div>
+            </div>
+            <p className="text-pink-400 mt-2">{getConditionFromIcon(selectedDay.icon)}</p>
+          </div>
+
+          {/* Previsão hora a hora do dia selecionado */}
+          {selectedHourly.length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-white/80 text-base mb-3">Previsão do tempo de hora em hora</h3>
+              <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                  {selectedHourly.map((hour, i) => (
+                    <div key={i} className="flex flex-col items-center min-w-[55px]">
+                      <span className="text-white text-lg font-light">{hour.temp}°</span>
+                      <div className="w-7 h-7 my-2"><WeatherIcon type={hour.icon} /></div>
+                      <span className="text-white/60 text-xs">{hour.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Condições climáticas diárias */}
+          <div className="mb-6">
+            <h3 className="text-white/80 text-base mb-3">Condições climáticas diárias</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {/* Chance de chuva */}
+              <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+                <span className="text-white/60 text-sm">Chance de chuva</span>
+                <div className="flex items-end gap-1 mt-2">
+                  <span className="text-white text-3xl font-light">{selectedDay.rain}</span>
+                  <span className="text-white/60 text-lg mb-0.5">%</span>
+                </div>
+                <div className="w-full bg-slate-700 rounded-full h-2 mt-3">
+                  <div 
+                    className="bg-blue-400 h-2 rounded-full transition-all"
+                    style={{ width: `${selectedDay.rain}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Temperatura */}
+              <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+                <span className="text-white/60 text-sm">Amplitude térmica</span>
+                <div className="flex items-end gap-1 mt-2">
+                  <span className="text-white text-3xl font-light">{selectedDay.high - selectedDay.low}</span>
+                  <span className="text-white/60 text-lg mb-0.5">°</span>
+                </div>
+                <p className="text-white/50 text-sm mt-1">Máx {selectedDay.high}° / Mín {selectedDay.low}°</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Nascer e pôr do sol - só mostra para hoje */}
+          {selectedDayIndex === 0 && (
+            <div className="mb-6">
+              <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
+                <h3 className="text-white font-medium mb-4">Nascer e pôr do sol</h3>
+                <div className="flex justify-between items-center">
+                  <div className="text-center">
+                    <div className="flex items-center gap-2 mb-1">
+                      <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 7a5 5 0 100 10 5 5 0 000-10zM12 15a3 3 0 110-6 3 3 0 010 6z"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                      </svg>
+                      <span className="text-white text-2xl font-light">{sun.sunrise}</span>
+                    </div>
+                    <span className="text-white/50 text-sm">Nascer do sol</span>
+                  </div>
+                  <div className="flex-1 flex justify-center">
+                    <svg className="w-8 h-8 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </div>
+                  <div className="text-center">
+                    <div className="flex items-center gap-2 mb-1">
+                      <svg className="w-5 h-5 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 7a5 5 0 100 10 5 5 0 000-10z"/>
+                        <path d="M12 21v2M12 1v2"/>
+                      </svg>
+                      <span className="text-white text-2xl font-light">{sun.sunset}</span>
+                    </div>
+                    <span className="text-white/50 text-sm">Pôr do sol</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Previsão dos próximos dias (lista) */}
+          <div className="mb-6">
+            <h3 className="text-white/80 text-base mb-3">Previsão do tempo para {days.length} dia(s)</h3>
+            <div className="bg-slate-800/50 backdrop-blur rounded-2xl overflow-hidden border border-white/5">
+              {days.map((day, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => onSelectDay(i)}
+                  className={`w-full flex items-center justify-between px-4 py-3 transition-colors text-left ${
+                    selectedDayIndex === i ? 'bg-white/10' : 'hover:bg-white/5'
+                  } ${i !== days.length - 1 ? 'border-b border-white/5' : ''}`}
+                >
+                  <div className="flex-1">
+                    <span className="text-white">{day.day === "Hoje" ? "Hoje" : `${day.day}, ${day.dateFormatted}`}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-blue-400 text-sm">{day.rain}%</span>
+                    <div className="w-6 h-6"><WeatherIcon type={day.icon} /></div>
+                  </div>
+                  <div className="w-24 text-right">
+                    <span className="text-white">{day.high}°</span>
+                    <span className="text-white/50">/{day.low}°</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Helper para obter descrição do tempo pelo ícone
+function getConditionFromIcon(icon: WeatherIconType): string {
+  const conditions: Record<WeatherIconType, string> = {
+    sunny: 'Ensolarado',
+    partlyCloudy: 'Parcialmente nublado',
+    cloudy: 'Nublado',
+    rainy: 'Chuva',
+    drizzle: 'Garoa',
+    thunderstorm: 'Tempestade',
+    snowy: 'Neve',
+    foggy: 'Neblina'
+  };
+  return conditions[icon] || 'Variável';
+}

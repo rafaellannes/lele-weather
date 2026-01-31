@@ -11,7 +11,8 @@ import {
   SunTimesCard,
   RainDetails,
   WeatherSkeleton,
-  InstallPrompt
+  InstallPrompt,
+  DayDetailModal
 } from './components/WeatherComponents';
 import { LocationResult, WeatherIconType } from './types/weather';
 import { searchCities } from './api/weather';
@@ -51,6 +52,10 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<LocationResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  
+  // Estado para modal de detalhes do dia
+  const [showDayDetail, setShowDayDetail] = useState(false);
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
   const debouncedQuery = useDebounce(searchQuery, 300);
 
@@ -77,6 +82,12 @@ function App() {
       state: location.state 
     });
   }, [fetchByCoords]);
+  
+  // Handler para abrir modal de detalhes do dia
+  const handleDayClick = useCallback((index: number) => {
+    setSelectedDayIndex(index);
+    setShowDayDetail(true);
+  }, []);
 
   const handleUseCurrentLocation = useCallback(() => {
     setShowSearch(false);
@@ -141,7 +152,7 @@ function App() {
 
             <RainForecastCard forecast={weather.rainForecast} />
             <HourlyForecastCard hours={weather.hourly} />
-            <DailyForecastCard days={weather.daily} />
+            <DailyForecastCard days={weather.daily} onDayClick={handleDayClick} />
             <CurrentConditions data={weather.current} />
             <SunTimesCard sun={weather.sun} />
             <RainDetails rainHourly={weather.rainHourly} volume={weather.rainForecast.volume} />
@@ -251,6 +262,19 @@ function App() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Day Detail Modal */}
+      {weather && (
+        <DayDetailModal
+          isOpen={showDayDetail}
+          onClose={() => setShowDayDetail(false)}
+          days={weather.daily}
+          selectedDayIndex={selectedDayIndex}
+          onSelectDay={setSelectedDayIndex}
+          hourlyByDay={weather.hourlyByDay}
+          sun={weather.sun}
+        />
       )}
 
       {/* PWA Install Prompt */}
