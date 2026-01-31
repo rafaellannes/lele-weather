@@ -88,7 +88,7 @@ export function useWeather() {
     );
   }, [fetchByCoords]);
 
-  // Buscar localização inicial
+  // Buscar localização inicial (apenas uma vez)
   useEffect(() => {
     // Primeiro, tentar carregar do cache
     const cached = loadFromCache();
@@ -101,11 +101,15 @@ export function useWeather() {
       // Restaurar nome da localização do cache
       if (cachedCoords?.locationName) {
         setCurrentLocationName(cachedCoords.locationName);
+        // Se já tem localização salva, não buscar GPS automaticamente
+        // O usuário pode atualizar manualmente se quiser
+        return;
       }
     }
     
-    // Depois, buscar dados atualizados
+    // Só busca GPS se não tem cache com localização definida
     getCurrentLocation();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-refresh a cada 10 minutos
