@@ -534,35 +534,6 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
               </div>
             </div>
           )}
-
-          {/* Previsão dos próximos dias (lista) */}
-          <div className="mb-6">
-            <h3 className="text-white/80 text-base mb-3">Previsão do tempo para {days.length} dia(s)</h3>
-            <div className="bg-slate-800/50 backdrop-blur rounded-2xl overflow-hidden border border-white/5">
-              {days.map((day, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => onSelectDay(i)}
-                  className={`w-full flex items-center justify-between px-4 py-3 transition-colors text-left ${
-                    selectedDayIndex === i ? 'bg-white/10' : 'hover:bg-white/5'
-                  } ${i !== days.length - 1 ? 'border-b border-white/5' : ''}`}
-                >
-                  <div className="flex-1">
-                    <span className="text-white">{day.day === "Hoje" ? "Hoje" : `${day.day}, ${day.dateFormatted}`}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-blue-400 text-sm">{day.rain}%</span>
-                    <div className="w-6 h-6"><WeatherIcon type={day.icon} /></div>
-                  </div>
-                  <div className="w-24 text-right">
-                    <span className="text-white">{day.high}°</span>
-                    <span className="text-white/50">/{day.low}°</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
