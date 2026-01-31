@@ -84,11 +84,17 @@
 .cursor-grab {
   cursor: grab;
   -webkit-overflow-scrolling: touch;
+  user-select: none;
 }
 
 .cursor-grab:active,
-.active\:cursor-grabbing:active {
+.active\:cursor-grabbing:active,
+.cursor-grab.dragging {
   cursor: grabbing;
+}
+
+.cursor-grab.dragging * {
+  pointer-events: none;
 }
 
 /* Pull to refresh indicator */

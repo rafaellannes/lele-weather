@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import { LeleAvatar } from './Icons';
+import { DragScrollContainer } from './DragScrollContainer';
 
 interface HeaderProps {
   city: string;
@@ -190,13 +191,13 @@ export const HourlyForecastSection: React.FC<HourlyForecastSectionProps> = ({ ch
     <h2 id="hourly-forecast-heading" className="text-lg font-semibold mb-3 flex items-center gap-2">
       <span aria-hidden="true">⏰</span> Próximas 24 horas
     </h2>
-    <div 
-      className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
+    <DragScrollContainer 
+      className="flex gap-2 pb-2"
       role="list"
-      aria-label="Previsão das próximas 24 horas"
+      ariaLabel="Previsão das próximas 24 horas"
     >
       {children}
-    </div>
+    </DragScrollContainer>
   </section>
 );
 

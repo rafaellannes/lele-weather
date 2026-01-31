@@ -4,6 +4,8 @@
 import React from 'react';
 import { DailyForecast, HourlyForecast, RainHourly, SunTimes, WeatherIconType } from '../types/weather';
 import { WeatherIcon } from './Icons';
+import { DragScrollContainer } from './DragScrollContainer';
+import { getRainBarHeight } from '../hooks/useDragScroll';
 
 // Helper para obter descrição do tempo pelo ícone
 function getConditionFromIcon(icon: WeatherIconType): string {
@@ -146,10 +148,10 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
 
         {/* Seletor de dias horizontal */}
         <div className="px-2 py-3 border-b border-white/10">
-          <div 
-            className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide"
+          <DragScrollContainer 
+            className="flex gap-1 pb-2"
             role="tablist"
-            aria-label="Selecionar dia"
+            ariaLabel="Selecionar dia"
           >
             {days.map((day, i) => (
               <button
@@ -176,7 +178,7 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
                 </span>
               </button>
             ))}
-          </div>
+          </DragScrollContainer>
           {/* Indicador de seleção */}
           <div className="flex justify-start px-1 mt-1" aria-hidden="true">
             <div 
@@ -214,10 +216,10 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
             <section className="mb-6" aria-labelledby="hourly-title">
               <h3 id="hourly-title" className="text-white/80 text-base mb-3">Previsão do tempo de hora em hora</h3>
               <div className="bg-slate-800/50 backdrop-blur rounded-2xl p-4 border border-white/5">
-                <div 
-                  className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide"
+                <DragScrollContainer 
+                  className="flex gap-4 pb-2"
                   role="list"
-                  aria-label="Previsão horária"
+                  ariaLabel="Previsão horária"
                 >
                   {selectedHourly.map((hour, i) => (
                     <div 
@@ -231,7 +233,7 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
                       <span className="text-white/60 text-xs">{hour.time}</span>
                     </div>
                   ))}
-                </div>
+                </DragScrollContainer>
               </div>
             </section>
           )}
@@ -319,10 +321,10 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
                   <p className="text-white/60 text-sm">Volume no dia</p>
                   <p className="text-white text-3xl font-light">{Math.round(dayRainVolume * 10) / 10} mm</p>
                 </div>
-                <div 
-                  className="flex items-end gap-2 h-20 overflow-x-auto pb-2 scrollbar-hide"
+                <DragScrollContainer 
+                  className="flex items-end gap-2 pb-2"
                   role="list"
-                  aria-label="Detalhes de chuva por hora"
+                  ariaLabel="Detalhes de chuva por hora"
                 >
                   {selectedRainHourly.map((hour, i) => (
                     <div 
@@ -332,18 +334,18 @@ export const DayDetailModal: React.FC<DayDetailModalProps> = ({
                       aria-label={`${hour.time}: ${hour.amount.toFixed(1)}mm, ${hour.chance}% chance`}
                     >
                       <span className="text-white/50 text-xs mb-1">
-                        {hour.amount > 0 ? `${hour.amount.toFixed(1)}` : '< 0,25'}
+                        {hour.amount > 0 ? `${hour.amount.toFixed(1)}` : '0'}
                       </span>
                       <div 
                         className="w-8 bg-blue-400/60 rounded-t transition-all group-hover:bg-blue-400" 
-                        style={{ height: `${Math.max(hour.amount * 20, 4)}px` }}
+                        style={{ height: `${getRainBarHeight(hour.amount)}px` }}
                         aria-hidden="true"
                       />
                       <span className="text-blue-400 text-xs mt-2">{hour.chance}%</span>
                       <span className="text-white/40 text-[10px]">{hour.time}</span>
                     </div>
                   ))}
-                </div>
+                </DragScrollContainer>
               </div>
             </section>
           )}
