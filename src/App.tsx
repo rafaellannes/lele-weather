@@ -72,9 +72,10 @@ function App() {
 
   // Ícone atual para o background dinâmico
   const currentWeatherIcon = weather?.current?.icon || 'cloudy';
+  const currentIsNight = weather?.current?.isNight || false;
 
   return (
-    <WeatherBackground weatherIcon={currentWeatherIcon}>
+    <WeatherBackground weatherIcon={currentWeatherIcon} isNight={currentIsNight}>
       {/* Offline Banner */}
       {!isOnline && (
         <div 
@@ -118,7 +119,7 @@ function App() {
 
             {/* Mascote Lele */}
             <div className="flex justify-center my-4">
-              <LeleMascotAnimated weather={weather.current.icon} size="lg" />
+              <LeleMascotAnimated weather={weather.current.icon} isNight={weather.current.isNight} size="lg" />
             </div>
 
             <RainForecastCard forecast={weather.rainForecast} />

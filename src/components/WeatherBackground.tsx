@@ -7,6 +7,7 @@ import { WeatherIconType } from '../types/weather';
 
 interface WeatherBackgroundProps {
   weatherIcon: WeatherIconType;
+  isNight?: boolean; // Flag independente para determinar dia/noite
   children: React.ReactNode;
 }
 
@@ -164,36 +165,36 @@ const Lightning: React.FC = () => {
 // Componente de raios de sol animados
 const SunRays: React.FC = () => {
   return (
-    <div className="absolute top-0 right-0 w-80 h-80 overflow-hidden pointer-events-none">
-      {/* Halo de luz */}
-      <div className="absolute -top-20 -right-20 w-64 h-64">
-        <div className="absolute inset-0 bg-gradient-radial from-amber-300/40 via-orange-300/20 to-transparent rounded-full animate-pulse-slow" />
-      </div>
-      
-      {/* Sol central */}
-      <div className="absolute top-8 right-8 w-16 h-16">
-        <div className="absolute inset-0 bg-gradient-radial from-yellow-200 via-amber-300 to-orange-400 rounded-full shadow-lg shadow-amber-400/50" />
-        <div className="absolute inset-1 bg-gradient-radial from-yellow-100 via-yellow-200 to-amber-300 rounded-full" />
+    <div className="absolute top-16 right-4 md:right-1/4 w-48 h-48 overflow-visible pointer-events-none">
+      {/* Halo de luz grande */}
+      <div className="absolute -inset-8">
+        <div className="absolute inset-0 bg-gradient-radial from-amber-300/30 via-orange-300/10 to-transparent rounded-full animate-pulse-slow" />
       </div>
       
       {/* Raios girando */}
-      <div className="absolute top-0 right-0 w-48 h-48 animate-spin-slow">
+      <div className="absolute inset-0 animate-spin-slow">
         {[...Array(12)].map((_, i) => (
           <div
             key={i}
-            className="absolute top-1/2 left-1/2 w-1 h-16 bg-gradient-to-t from-amber-400/60 via-yellow-300/40 to-transparent origin-bottom"
+            className="absolute top-1/2 left-1/2 w-1.5 h-20 bg-gradient-to-t from-amber-400/50 via-yellow-300/30 to-transparent origin-bottom rounded-full"
             style={{
               transform: `translateX(-50%) rotate(${i * 30}deg)`,
-              opacity: i % 2 === 0 ? 0.6 : 0.3
+              opacity: i % 2 === 0 ? 0.5 : 0.25
             }}
           />
         ))}
       </div>
       
+      {/* Sol central */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20">
+        <div className="absolute inset-0 bg-gradient-radial from-yellow-200 via-amber-300 to-orange-400 rounded-full shadow-lg shadow-amber-400/50 animate-pulse-slow" />
+        <div className="absolute inset-2 bg-gradient-radial from-yellow-100 via-yellow-200 to-amber-300 rounded-full" />
+      </div>
+      
       {/* Brilhos flutuantes */}
-      <div className="absolute top-16 right-32 w-2 h-2 bg-yellow-200 rounded-full animate-float-1 opacity-60" />
-      <div className="absolute top-32 right-16 w-1.5 h-1.5 bg-amber-200 rounded-full animate-float-2 opacity-50" />
-      <div className="absolute top-24 right-24 w-1 h-1 bg-yellow-100 rounded-full animate-float-3 opacity-70" />
+      <div className="absolute -top-4 left-8 w-2 h-2 bg-yellow-200 rounded-full animate-float-1 opacity-60" />
+      <div className="absolute top-8 -left-4 w-1.5 h-1.5 bg-amber-200 rounded-full animate-float-2 opacity-50" />
+      <div className="absolute -bottom-4 right-8 w-1 h-1 bg-yellow-100 rounded-full animate-float-3 opacity-70" />
     </div>
   );
 };
@@ -208,23 +209,32 @@ const MoonGlow: React.FC = () => {
   );
 };
 
-export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherIcon, children }) => {
-  const gradient = gradientConfig[weatherIcon] || gradientConfig.cloudy;
+export const WeatherBackground: React.FC<WeatherBackgroundProps> = ({ weatherIcon, isNight: isNightProp, children }) => {
+  // Usa a prop isNight se fornecida, senão infere do ícone (fallback)
+  const isNightFromIcon = weatherIcon === 'clearNight' || weatherIcon === 'partlyCloudyNight';
+  const isNight = isNightProp !== undefined ? isNightProp : isNightFromIcon;
   
-  const isNight = weatherIcon === 'clearNight' || weatherIcon === 'partlyCloudyNight';
+  // Ajusta o gradiente baseado na flag isNight
+  let gradient = gradientConfig[weatherIcon] || gradientConfig.cloudy;
+  
+  // Se é noite mas o ícone não indica (ex: cloudy à noite), usar gradiente mais escuro
+  if (isNight && !isNightFromIcon) {
+    gradient = 'from-indigo-950/30 via-slate-900 to-slate-900';
+  }
+  
   const isRainy = weatherIcon === 'rainy' || weatherIcon === 'drizzle';
   const isThunderstorm = weatherIcon === 'thunderstorm';
   const isSnowy = weatherIcon === 'snowy';
   const isCloudy = weatherIcon === 'cloudy' || weatherIcon === 'partlyCloudy' || weatherIcon === 'partlyCloudyNight';
   const isSunny = weatherIcon === 'sunny';
-  const isClearNight = weatherIcon === 'clearNight';
+  const isClearNight = weatherIcon === 'clearNight' || (isNight && weatherIcon === 'sunny');
 
   return (
     <div className={`min-h-screen bg-gradient-to-b ${gradient} transition-all duration-1000 relative`}>
       {/* Partículas e efeitos */}
       {isNight && <Stars />}
-      {isClearNight && <MoonGlow />}
-      {isSunny && <SunRays />}
+      {(isClearNight || (isNight && !isRainy && !isThunderstorm && !isSnowy)) && <MoonGlow />}
+      {isSunny && !isNight && <SunRays />}
       {isRainy && <RainDrops intensity="light" />}
       {isThunderstorm && (
         <>

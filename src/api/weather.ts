@@ -322,8 +322,9 @@ function formatWeatherData(
     ? (location.state ? `${location.name}, ${location.state}` : location.name)
     : `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
 
-  // Verificar se agora é noite para o ícone atual (usar hora local da cidade)
-  const currentIsNight = isNightHour(currentHourLocal, todaySunrise, todaySunset);
+  // Verificar se agora é noite usando a função com precisão de minutos
+  // Usa o horário completo da API para maior precisão
+  const currentIsNight = isNightTime(currentTimeFromApi, todaySunrise, todaySunset);
 
   return {
     location: locationDisplay,
@@ -341,7 +342,8 @@ function formatWeatherData(
       pressure: Math.round(current.pressure_msl || 1013),
       uvIndex: Math.round(current.uv_index || 0),
       dewPoint,
-      icon: mapWeatherCode(current.weather_code || 0, currentIsNight)
+      icon: mapWeatherCode(current.weather_code || 0, currentIsNight),
+      isNight: currentIsNight // Flag independente do ícone
     },
     rainForecast: {
       duration: estimateRainDuration(hourly, currentHour),
@@ -382,15 +384,44 @@ function extractHour(timeStr: string): number {
 }
 
 /**
+ * Converte uma string de tempo para minutos desde meia-noite
+ */
+function timeToMinutes(timeStr: string): number {
+  if (!timeStr) return 0;
+  
+  // Se contém 'T', é formato ISO (2026-01-31T06:30)
+  const timePart = timeStr.includes('T') ? timeStr.split('T')[1] : timeStr;
+  const [hours, minutes] = timePart.split(':').map(Number);
+  return hours * 60 + (minutes || 0);
+}
+
+/**
  * Verifica se uma hora específica é noite
+ * CORRIGIDO: Agora usa minutos para precisão maior
  * Considera noite: antes do nascer do sol ou depois do pôr do sol
  */
 function isNightHour(hour: number, sunrise?: string, sunset?: string): boolean {
-  const sunriseHour = sunrise ? extractHour(sunrise) : 6;
-  const sunsetHour = sunset ? extractHour(sunset) : 18;
+  // Se não temos dados precisos, usar aproximação por hora
+  const sunriseMinutes = sunrise ? timeToMinutes(sunrise) : 6 * 60; // 06:00
+  const sunsetMinutes = sunset ? timeToMinutes(sunset) : 18 * 60;   // 18:00
+  
+  // Converter hora atual para minutos (assumindo :00 se só temos a hora)
+  const currentMinutes = hour * 60;
   
   // Noite é antes do nascer ou depois do pôr do sol
-  return hour < sunriseHour || hour >= sunsetHour;
+  return currentMinutes < sunriseMinutes || currentMinutes >= sunsetMinutes;
+}
+
+/**
+ * Verifica se é noite usando tempo completo (com minutos)
+ * Usada quando temos o horário completo disponível
+ */
+function isNightTime(currentTime: string, sunrise: string, sunset: string): boolean {
+  const currentMinutes = timeToMinutes(currentTime);
+  const sunriseMinutes = timeToMinutes(sunrise);
+  const sunsetMinutes = timeToMinutes(sunset);
+  
+  return currentMinutes < sunriseMinutes || currentMinutes >= sunsetMinutes;
 }
 
 /**

@@ -7,6 +7,7 @@ import { WeatherIconType } from '../types/weather';
 
 interface LeleMascotProps {
     weather: WeatherIconType;
+    isNight?: boolean; // Flag independente para determinar dia/noite
     className?: string;
     size?: 'sm' | 'md' | 'lg' | 'xl';
 }
@@ -486,18 +487,32 @@ const LeleFoggy: React.FC<{ className?: string }> = ({ className }) => (
     </svg>
 );
 
-// Mapa de componentes
-const leleMascotMap: Record<WeatherIconType, React.FC<{ className?: string }>> = {
+// Mapa de componentes para o DIA
+const leleMascotMapDay: Record<WeatherIconType, React.FC<{ className?: string }>> = {
     sunny: LeleSunny,
-    clearNight: LeleSunny,  // Usa o mesmo mascote ensolarado para noite limpa
-    cloudy: LeleCloudy,
+    clearNight: LeleSunny,
+    cloudy: LelePartlyCloudy,      // De dia, nublado mostra Lele relaxada (não dormindo)
     rainy: LeleRainy,
     thunderstorm: LeleThunderstorm,
     partlyCloudy: LelePartlyCloudy,
-    partlyCloudyNight: LelePartlyCloudy,  // Usa parcialmente nublado para noite
+    partlyCloudyNight: LelePartlyCloudy,
     drizzle: LeleDrizzle,
     snowy: LeleSnowy,
     foggy: LeleFoggy,
+};
+
+// Mapa de componentes para a NOITE
+const leleMascotMapNight: Record<WeatherIconType, React.FC<{ className?: string }>> = {
+    sunny: LeleCloudy,             // À noite, usa Lele dormindo
+    clearNight: LeleCloudy,        // Céu limpo à noite = dormindo
+    cloudy: LeleCloudy,            // Nublado à noite = dormindo
+    rainy: LeleRainy,              // Chuva continua igual
+    thunderstorm: LeleThunderstorm, // Tempestade continua igual
+    partlyCloudy: LeleCloudy,      // Parcial à noite = dormindo
+    partlyCloudyNight: LeleCloudy,
+    drizzle: LeleDrizzle,          // Garoa continua igual
+    snowy: LeleSnowy,              // Neve continua igual
+    foggy: LeleFoggy,              // Neblina continua igual
 };
 
 // Tamanhos
@@ -511,10 +526,13 @@ const sizeMap = {
 // Componente principal
 export const LeleMascot: React.FC<LeleMascotProps> = ({ 
     weather, 
+    isNight = false,  // Usa a flag isNight para escolher o mapa correto
     className = '',
     size = 'lg'
 }) => {
-    const MascotComponent = leleMascotMap[weather] || LelePartlyCloudy;
+    // Escolhe o mapa baseado em isNight (flag independente do ícone)
+    const mascotMap = isNight ? leleMascotMapNight : leleMascotMapDay;
+    const MascotComponent = mascotMap[weather] || LelePartlyCloudy;
     const sizeClass = sizeMap[size];
     
     return (

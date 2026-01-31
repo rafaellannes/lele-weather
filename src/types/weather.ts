@@ -23,6 +23,7 @@ export interface WeatherCurrent {
   uvIndex: number;
   dewPoint: number;
   icon: WeatherIconType;
+  isNight: boolean; // Flag independente para determinar dia/noite
 }
 
 export interface RainForecast {
