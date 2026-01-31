@@ -7,33 +7,43 @@ import { useRef, useEffect, useCallback } from 'react';
 export function useDragScroll<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   const isDown = useRef(false);
+  const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
 
   const handleMouseDown = useCallback((e: MouseEvent) => {
     if (!ref.current) return;
     isDown.current = true;
-    ref.current.classList.add('dragging');
+    isDragging.current = false;
     startX.current = e.pageX - ref.current.offsetLeft;
     scrollLeft.current = ref.current.scrollLeft;
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     isDown.current = false;
+    isDragging.current = false;
     ref.current?.classList.remove('dragging');
   }, []);
 
   const handleMouseUp = useCallback(() => {
     isDown.current = false;
+    isDragging.current = false;
     ref.current?.classList.remove('dragging');
   }, []);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDown.current || !ref.current) return;
-    e.preventDefault();
+    
     const x = e.pageX - ref.current.offsetLeft;
-    const walk = (x - startX.current) * 1.5; // Velocidade do scroll
-    ref.current.scrollLeft = scrollLeft.current - walk;
+    const walk = (x - startX.current) * 1.5;
+    
+    // Só considera drag se moveu mais de 5 pixels
+    if (Math.abs(x - startX.current) > 5) {
+      isDragging.current = true;
+      ref.current.classList.add('dragging');
+      e.preventDefault();
+      ref.current.scrollLeft = scrollLeft.current - walk;
+    }
   }, []);
 
   // Scroll horizontal com wheel (Shift + scroll ou scroll horizontal nativo)
