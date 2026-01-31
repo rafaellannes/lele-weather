@@ -35,6 +35,25 @@ function App() {
 
   const debouncedQuery = useDebounce(searchQuery, SEARCH_CONFIG.DEBOUNCE_MS);
 
+  // Gerenciar histórico do navegador para modais (suporte ao botão voltar em PWA)
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      // Se o modal de busca está aberto e não há estado de modal no histórico
+      if (showSearch && !event.state?.modal) {
+        setShowSearch(false);
+        setSearchQuery('');
+        setSearchResults([]);
+      }
+      // Se o modal de detalhes do dia está aberto
+      if (showDayDetail && !event.state?.dayDetail) {
+        setShowDayDetail(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [showSearch, showDayDetail]);
+
   // Buscar cidades quando o query mudar
   useEffect(() => {
     if (debouncedQuery.length < SEARCH_CONFIG.MIN_LENGTH) {
@@ -52,6 +71,10 @@ function App() {
     setShowSearch(false);
     setSearchQuery('');
     setSearchResults([]);
+    // Se há um estado de modal no histórico, volta
+    if (window.history.state?.modal) {
+      window.history.back();
+    }
     // Passa o nome da localização para preservar o nome escolhido pelo usuário
     await fetchByCoords(location.lat, location.lon, {
       name: location.name,
@@ -63,10 +86,43 @@ function App() {
   const handleDayClick = useCallback((index: number) => {
     setSelectedDayIndex(index);
     setShowDayDetail(true);
+    // Adiciona estado ao histórico para permitir voltar com botão do navegador
+    window.history.pushState({ dayDetail: true }, '');
+  }, []);
+
+  // Handler para fechar modal de detalhes do dia
+  const handleCloseDayDetail = useCallback(() => {
+    setShowDayDetail(false);
+    // Se há um estado de modal no histórico, volta
+    if (window.history.state?.dayDetail) {
+      window.history.back();
+    }
+  }, []);
+
+  // Handler para abrir busca
+  const handleOpenSearch = useCallback(() => {
+    setShowSearch(true);
+    // Adiciona estado ao histórico para permitir voltar com botão do navegador
+    window.history.pushState({ modal: true }, '');
+  }, []);
+
+  // Handler para fechar busca
+  const handleCloseSearch = useCallback(() => {
+    setShowSearch(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    // Se há um estado de modal no histórico, volta
+    if (window.history.state?.modal) {
+      window.history.back();
+    }
   }, []);
 
   const handleUseCurrentLocation = useCallback(() => {
     setShowSearch(false);
+    // Se há um estado de modal no histórico, volta
+    if (window.history.state?.modal) {
+      window.history.back();
+    }
     getCurrentLocation();
   }, [getCurrentLocation]);
 
@@ -108,7 +164,7 @@ function App() {
       <main className="max-w-md mx-auto pb-20">
         <Header
           address={weather?.address || 'Buscando localização...'}
-          onSearch={() => setShowSearch(true)}
+          onSearch={handleOpenSearch}
         />
 
         {isLoading && !weather ? (
@@ -174,7 +230,7 @@ function App() {
             <div className="flex items-center gap-3 mb-4">
               <button
                 type="button"
-                onClick={() => setShowSearch(false)}
+                onClick={handleCloseSearch}
                 className="text-white/70 hover:text-white p-2 -ml-2 focus:ring-2 focus:ring-white/30 rounded-lg"
                 aria-label="Fechar busca"
               >
@@ -256,7 +312,7 @@ function App() {
       {weather && (
         <DayDetailModal
           isOpen={showDayDetail}
-          onClose={() => setShowDayDetail(false)}
+          onClose={handleCloseDayDetail}
           days={weather.daily}
           selectedDayIndex={selectedDayIndex}
           onSelectDay={setSelectedDayIndex}
