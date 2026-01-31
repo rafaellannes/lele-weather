@@ -168,31 +168,35 @@ function formatWeatherData(
   const daily = data.daily || {};
 
   // Usar o horário da API (já está no timezone da cidade pesquisada)
-  // Encontrar o índice da hora atual baseado no tempo atual da API
-  const currentTimeFromApi = current.time || hourly.time?.[0];
-  const currentHourLocal = currentTimeFromApi ? extractHour(currentTimeFromApi) : new Date().getHours();
+  // current.time vem como "2026-01-31T12:45" no timezone local da cidade
+  const currentTimeFromApi = current.time || '';
+  const currentHourLocal = extractHour(currentTimeFromApi);
   
-  // Encontrar o índice correto na array hourly baseado no horário atual
+  // Extrair a data do current.time para encontrar o índice correto
+  const currentDateFromApi = currentTimeFromApi.split('T')[0]; // "2026-01-31"
+  
+  // Encontrar o índice correto na array hourly baseado no horário atual da cidade
   let currentHourIndex = 0;
   if (hourly.time && hourly.time.length > 0) {
-    const now = new Date();
-    const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
-    
-    // Procurar o índice mais próximo do horário atual no timezone da cidade
+    // Procurar o horário exato ou o mais próximo
     for (let i = 0; i < hourly.time.length; i++) {
       const hourTime = hourly.time[i];
-      if (hourTime && hourTime.includes(currentDate)) {
+      if (hourTime && hourTime.startsWith(currentDateFromApi)) {
         const hourValue = extractHour(hourTime);
         if (hourValue === currentHourLocal) {
           currentHourIndex = i;
           break;
         }
+        // Guardar o primeiro índice do dia atual como fallback
+        if (hourValue === 0 && currentHourIndex === 0) {
+          currentHourIndex = i;
+        }
       }
     }
     
-    // Se não encontrou, usar o índice baseado na hora
-    if (currentHourIndex === 0 && currentHourLocal > 0) {
-      currentHourIndex = currentHourLocal;
+    // Se encontrou o dia mas não a hora exata, ajustar o índice
+    if (currentHourIndex > 0 || currentHourLocal === 0) {
+      currentHourIndex = currentHourIndex + currentHourLocal;
     }
   }
   
