@@ -28,7 +28,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<LocationResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  
+
   // Estado para modal de detalhes do dia
   const [showDayDetail, setShowDayDetail] = useState(false);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
@@ -53,12 +53,12 @@ function App() {
     setSearchQuery('');
     setSearchResults([]);
     // Passa o nome da localização para preservar o nome escolhido pelo usuário
-    await fetchByCoords(location.lat, location.lon, { 
-      name: location.name, 
-      state: location.state 
+    await fetchByCoords(location.lat, location.lon, {
+      name: location.name,
+      state: location.state
     });
   }, [fetchByCoords]);
-  
+
   // Handler para abrir modal de detalhes do dia
   const handleDayClick = useCallback((index: number) => {
     setSelectedDayIndex(index);
@@ -78,7 +78,7 @@ function App() {
     <WeatherBackground weatherIcon={currentWeatherIcon} isNight={currentIsNight}>
       {/* Offline Banner */}
       {!isOnline && (
-        <div 
+        <div
           className="bg-amber-500 text-black text-center py-2 text-sm sticky top-0 z-50"
           role="alert"
           aria-live="polite"
@@ -89,14 +89,14 @@ function App() {
 
       {/* Error Banner */}
       {error && (
-        <div 
+        <div
           className="bg-red-500/90 text-white text-center py-2 text-sm sticky top-0 z-50"
           role="alert"
           aria-live="assertive"
         >
           {error}
-          <button 
-            onClick={refresh} 
+          <button
+            onClick={refresh}
             className="ml-2 underline focus:ring-2 focus:ring-white rounded"
             aria-label="Tentar carregar dados novamente"
           >
@@ -144,7 +144,7 @@ function App() {
                 LeleWeather • Dados: Open-Meteo
               </p>
               <p className="text-pink-400/60 text-xs mt-2">
-                Feito com ❤️ para Lele
+                Feito com 💚 para Lele
               </p>
             </footer>
           </>
@@ -164,7 +164,7 @@ function App() {
 
       {/* Search Modal */}
       {showSearch && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900 z-50 overflow-y-auto"
           role="dialog"
           aria-modal="true"
