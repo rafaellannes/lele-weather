@@ -1,7 +1,8 @@
 // API Service - Chama Open-Meteo diretamente do navegador (GRATUITO!)
 import { WeatherData, WeatherIconType, LocationResult } from '../types/weather';
 
-const OPEN_METEO_URL = 'https://api.open-meteo.com/v1';
+// Usando modelo ECMWF (Centro Europeu) - mais preciso
+const OPEN_METEO_URL = 'https://api.open-meteo.com/v1/ecmwf';
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1';
 
 /**
@@ -24,8 +25,7 @@ export async function fetchWeatherByCoords(
       'weather_code',
       'pressure_msl',
       'wind_speed_10m',
-      'wind_direction_10m',
-      'uv_index'
+      'wind_direction_10m'
     ].join(','),
     hourly: [
       'temperature_2m',
@@ -46,7 +46,7 @@ export async function fetchWeatherByCoords(
     forecast_days: '10'
   });
 
-  const response = await fetch(`${OPEN_METEO_URL}/forecast?${params}`);
+  const response = await fetch(`${OPEN_METEO_URL}?${params}`);
   
   if (!response.ok) {
     throw new Error('Falha ao buscar dados do clima');
