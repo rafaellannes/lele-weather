@@ -205,8 +205,13 @@ function formatWeatherData(
   const humidity = current.relative_humidity_2m || 50;
   const dewPoint = calculateDewPoint(temp, humidity);
 
+  // Formatar nome da localização (evitar vírgula solta se não tiver estado)
+  const locationDisplay = location 
+    ? (location.state ? `${location.name}, ${location.state}` : location.name)
+    : `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+
   return {
-    location: location ? `${location.name}, ${location.state}` : `${lat.toFixed(2)}, ${lon.toFixed(2)}`,
+    location: locationDisplay,
     address: location?.name || 'Sua localização',
     coords: { lat, lon },
     current: {
@@ -405,15 +410,27 @@ export function loadFromCache(): WeatherData | null {
   }
 }
 
-export function saveCoordsToCache(lat: number, lon: number): void {
+export function saveCoordsToCache(
+  lat: number, 
+  lon: number, 
+  locationName?: { name: string; state?: string }
+): void {
   try {
-    localStorage.setItem('leleweather_coords', JSON.stringify({ lat, lon }));
+    localStorage.setItem('leleweather_coords', JSON.stringify({ 
+      lat, 
+      lon,
+      locationName: locationName || null
+    }));
   } catch {
     // Ignore
   }
 }
 
-export function loadCoordsFromCache(): { lat: number; lon: number } | null {
+export function loadCoordsFromCache(): { 
+  lat: number; 
+  lon: number; 
+  locationName?: { name: string; state?: string } | null 
+} | null {
   try {
     const cached = localStorage.getItem('leleweather_coords');
     if (!cached) return null;

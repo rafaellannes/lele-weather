@@ -14,6 +14,7 @@ export function useWeather() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentLocationName, setCurrentLocationName] = useState<{ name: string; state?: string } | null>(null);
 
   const fetchByCoords = useCallback(async (
     lat: number, 
@@ -23,11 +24,16 @@ export function useWeather() {
     setIsLoading(true);
     setError(null);
 
+    // Guardar o nome da localização se foi passado
+    if (locationName) {
+      setCurrentLocationName(locationName);
+    }
+
     try {
       const data = await fetchWeatherByCoords(lat, lon, locationName);
       setWeather(data);
       saveToCache(data);
-      saveCoordsToCache(lat, lon);
+      saveCoordsToCache(lat, lon, locationName);
     } catch (err) {
       setError('Não foi possível obter os dados do clima');
       // Tentar carregar do cache
@@ -42,8 +48,9 @@ export function useWeather() {
 
   const refresh = useCallback(async () => {
     if (!weather?.coords) return;
-    await fetchByCoords(weather.coords.lat, weather.coords.lon);
-  }, [weather?.coords, fetchByCoords]);
+    // Usar o nome da localização salvo no refresh
+    await fetchByCoords(weather.coords.lat, weather.coords.lon, currentLocationName || undefined);
+  }, [weather?.coords, fetchByCoords, currentLocationName]);
 
   const getCurrentLocation = useCallback(async () => {
     if (!navigator.geolocation) {
@@ -53,6 +60,8 @@ export function useWeather() {
     }
 
     setIsLoading(true);
+    // Limpar nome da localização quando usar GPS
+    setCurrentLocationName(null);
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -65,7 +74,7 @@ export function useWeather() {
         // Tentar carregar coords do cache
         const cachedCoords = loadCoordsFromCache();
         if (cachedCoords) {
-          fetchByCoords(cachedCoords.lat, cachedCoords.lon);
+          fetchByCoords(cachedCoords.lat, cachedCoords.lon, cachedCoords.locationName || undefined);
         } else {
           // Fallback: Nova Iguaçu, RJ
           fetchByCoords(-22.7556, -43.4603);
@@ -83,9 +92,16 @@ export function useWeather() {
   useEffect(() => {
     // Primeiro, tentar carregar do cache
     const cached = loadFromCache();
+    const cachedCoords = loadCoordsFromCache();
+    
     if (cached) {
       setWeather(cached);
       setIsLoading(false);
+      
+      // Restaurar nome da localização do cache
+      if (cachedCoords?.locationName) {
+        setCurrentLocationName(cachedCoords.locationName);
+      }
     }
     
     // Depois, buscar dados atualizados
