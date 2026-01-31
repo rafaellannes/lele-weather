@@ -169,18 +169,31 @@ function formatWeatherData(
 
   const now = new Date();
   const currentHour = now.getHours();
+  
+  // Pegar sunrise/sunset do primeiro dia para referência
+  const todaySunrise = daily.sunrise?.[0] || '06:00';
+  const todaySunset = daily.sunset?.[0] || '18:00';
+
+  // Helper para extrair hora de um timestamp
+  const getHourFromTime = (timeStr: string): number => {
+    const date = new Date(timeStr);
+    return date.getHours();
+  };
 
   // Previsão horária (próximas horas conforme config)
   const hourlyForecast = [];
   for (let i = 0; i < FORECAST_CONFIG.HOURS; i++) {
     const index = currentHour + i;
     if (index >= (hourly.time?.length || 0)) break;
+    
+    const hour = getHourFromTime(hourly.time[index]);
+    const isNight = isNightHour(hour, todaySunrise, todaySunset);
 
     hourlyForecast.push({
       time: i === 0 ? 'Agora' : formatTime(hourly.time[index]),
       temp: Math.round(hourly.temperature_2m?.[index] || 0),
       rain: hourly.precipitation_probability?.[index] || 0,
-      icon: mapWeatherCode(hourly.weather_code?.[index] || 0)
+      icon: mapWeatherCode(hourly.weather_code?.[index] || 0, isNight)
     });
   }
 
@@ -193,15 +206,22 @@ function formatWeatherData(
     const startHour = dayIndex === 0 ? currentHour : 0; // Hoje começa da hora atual
     const hoursToShow = dayIndex === 0 ? 24 - currentHour : 24; // Quantas horas mostrar
     
+    // Usar sunrise/sunset do dia específico
+    const daySunrise = daily.sunrise?.[dayIndex] || todaySunrise;
+    const daySunset = daily.sunset?.[dayIndex] || todaySunset;
+    
     for (let h = 0; h < hoursToShow; h++) {
       const hourIndex = (dayIndex * 24) + startHour + h;
       if (hourIndex >= (hourly.time?.length || 0)) break;
+      
+      const hour = getHourFromTime(hourly.time[hourIndex]);
+      const isNight = isNightHour(hour, daySunrise, daySunset);
       
       dayHourly.push({
         time: formatTime(hourly.time[hourIndex]),
         temp: Math.round(hourly.temperature_2m?.[hourIndex] || 0),
         rain: hourly.precipitation_probability?.[hourIndex] || 0,
-        icon: mapWeatherCode(hourly.weather_code?.[hourIndex] || 0)
+        icon: mapWeatherCode(hourly.weather_code?.[hourIndex] || 0, isNight)
       });
     }
     
@@ -270,6 +290,9 @@ function formatWeatherData(
     ? (location.state ? `${location.name}, ${location.state}` : location.name)
     : `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
 
+  // Verificar se agora é noite para o ícone atual
+  const currentIsNight = isNightHour(currentHour, todaySunrise, todaySunset);
+
   return {
     location: locationDisplay,
     address: location?.name || 'Sua localização',
@@ -286,7 +309,7 @@ function formatWeatherData(
       pressure: Math.round(current.pressure_msl || 1013),
       uvIndex: Math.round(current.uv_index || 0),
       dewPoint,
-      icon: mapWeatherCode(current.weather_code || 0)
+      icon: mapWeatherCode(current.weather_code || 0, currentIsNight)
     },
     rainForecast: {
       duration: estimateRainDuration(hourly, currentHour),
@@ -309,9 +332,30 @@ function formatWeatherData(
 }
 
 // Helpers
-function mapWeatherCode(code: number): WeatherIconType {
-  if (code === 0) return 'sunny';
-  if (code === 1) return 'sunny';
+
+/**
+ * Verifica se uma hora específica é noite
+ * Considera noite: antes das 6h ou depois das 18h
+ * Se tiver dados de sunrise/sunset, usa eles
+ */
+function isNightHour(hour: number, sunrise?: string, sunset?: string): boolean {
+  if (sunrise && sunset) {
+    const sunriseHour = parseInt(sunrise.split(':')[0], 10);
+    const sunsetHour = parseInt(sunset.split(':')[0], 10);
+    return hour < sunriseHour || hour >= sunsetHour;
+  }
+  // Fallback: noite entre 18h e 6h
+  return hour < 6 || hour >= 18;
+}
+
+/**
+ * Mapeia código de clima para ícone, considerando dia/noite
+ */
+function mapWeatherCode(code: number, isNight: boolean = false): WeatherIconType {
+  // Para céu limpo ou predominantemente limpo, diferenciar dia/noite
+  if (code === 0 || code === 1) {
+    return isNight ? 'partlyCloudy' : 'sunny'; // partlyCloudy tem visual mais "noturno"
+  }
   if (code === 2) return 'partlyCloudy';
   if (code === 3) return 'cloudy';
   if (code >= 45 && code <= 48) return 'foggy';
