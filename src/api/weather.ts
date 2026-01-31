@@ -320,11 +320,20 @@ function formatTime(dateStr: string): string {
 }
 
 function formatDayName(dateStr: string): string {
-  const date = new Date(dateStr);
+  // Adiciona T12:00 para evitar problemas de timezone
+  const date = new Date(dateStr + 'T12:00:00');
   const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
   
   if (date.toDateString() === today.toDateString()) {
     return 'Hoje';
+  }
+  
+  if (date.toDateString() === tomorrow.toDateString()) {
+    return 'Amanhã';
   }
   
   const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -332,7 +341,8 @@ function formatDayName(dateStr: string): string {
 }
 
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
+  // Adiciona T12:00 para evitar problemas de timezone
+  const date = new Date(dateStr + 'T12:00:00');
   const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
   return `${date.getDate()} de ${months[date.getMonth()]}.`;
 }
