@@ -2,6 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   ANIMAÇÕES DO BACKGROUND DINÂMICO
+   ============================================ */
+
+/* Estrelas piscando */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.animate-twinkle {
+  animation: twinkle ease-in-out infinite;
+}
+
+/* Gotas de chuva */
+@keyframes rain {
+  0% { transform: translateY(-20px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.animate-rain {
+  animation: rain linear infinite;
+}
+
+/* Flocos de neve */
+@keyframes snow {
+  0% { 
+    transform: translateY(-20px) translateX(0) rotate(0deg); 
+    opacity: 0; 
+  }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { 
+    transform: translateY(100vh) translateX(var(--drift, 0px)) rotate(360deg); 
+    opacity: 0; 
+  }
+}
+
+.animate-snow {
+  animation: snow linear infinite;
+}
+
+/* Nuvens flutuando */
+@keyframes cloud-float {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
+
+.animate-cloud-float {
+  animation: cloud-float linear infinite;
+}
+
+/* Relâmpago */
+@keyframes lightning {
+  0%, 89%, 91%, 93%, 95%, 100% { opacity: 0; }
+  90%, 92%, 94% { opacity: 1; }
+}
+
+.animate-lightning {
+  animation: lightning 8s ease-in-out infinite;
+}
+
+/* Pulso lento (raios de sol) */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+/* Gradiente radial para sol/lua */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* ============================================
+   FUNDOS LEGADOS (podem ser removidos depois)
+   ============================================ */
+
 /* Fundos dinâmicos baseados no clima */
 .weather-bg-sunny {
   background: linear-gradient(180deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
