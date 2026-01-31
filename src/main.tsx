@@ -3,35 +3,22 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 
-// Versão do app - mude para forçar atualização
-const APP_VERSION = '2.0.0'
-const STORED_VERSION = localStorage.getItem('app_version')
-
-// Se versão mudou, limpa TUDO
-if (STORED_VERSION !== APP_VERSION) {
-  // Limpa todos os caches
-  if ('caches' in window) {
-    caches.keys().then(names => {
-      Promise.all(names.map(name => caches.delete(name)))
-    })
-  }
-  
-  // Desregistra TODOS os Service Workers
+// Limpa Service Workers e caches antigos (uma vez)
+const CACHE_CLEARED = localStorage.getItem('cache_cleared_v3')
+if (!CACHE_CLEARED) {
+  // Desregistra todos os SWs
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(registrations => {
-      registrations.forEach(registration => {
-        registration.unregister()
-      })
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(r => r.unregister())
     })
   }
-  
-  // Salva nova versão
-  localStorage.setItem('app_version', APP_VERSION)
-  
-  // Força reload limpo (apenas uma vez)
-  if (STORED_VERSION) {
-    window.location.reload()
+  // Limpa caches
+  if ('caches' in window) {
+    caches.keys().then(keys => keys.forEach(k => caches.delete(k)))
   }
+  localStorage.setItem('cache_cleared_v3', 'true')
+  // Reload para aplicar
+  setTimeout(() => window.location.reload(), 100)
 }
 
 // Remove loading screen

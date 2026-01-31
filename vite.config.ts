@@ -12,24 +12,20 @@ export default defineConfig({
         enabled: false
       },
       workbox: {
-        // Força atualização imediata sem esperar fechar o app
         skipWaiting: true,
         clientsClaim: true,
-        // Não usar cache para o HTML (sempre busca do servidor)
-        navigateFallback: null,
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // NÃO cachear arquivos estáticos - sempre busca do servidor
+        globPatterns: [],
+        // Só cachear API de clima (para funcionar offline)
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\.open-meteo\.com\/.*/i,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'weather-api-cache',
+              cacheName: 'weather-api',
               expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 5 // 5 minutos
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 5
               }
             }
           }
