@@ -181,22 +181,15 @@ function formatWeatherData(
     // Procurar o horário exato ou o mais próximo
     for (let i = 0; i < hourly.time.length; i++) {
       const hourTime = hourly.time[i];
-      if (hourTime && hourTime.startsWith(currentDateFromApi)) {
+      if (hourTime) {
         const hourValue = extractHour(hourTime);
-        if (hourValue === currentHourLocal) {
+        const hourDate = hourTime.split('T')[0];
+        // Encontrar o índice que corresponde à data e hora atual
+        if (hourDate === currentDateFromApi && hourValue === currentHourLocal) {
           currentHourIndex = i;
           break;
         }
-        // Guardar o primeiro índice do dia atual como fallback
-        if (hourValue === 0 && currentHourIndex === 0) {
-          currentHourIndex = i;
-        }
       }
-    }
-    
-    // Se encontrou o dia mas não a hora exata, ajustar o índice
-    if (currentHourIndex > 0 || currentHourLocal === 0) {
-      currentHourIndex = currentHourIndex + currentHourLocal;
     }
   }
   

@@ -188,7 +188,7 @@ const Lightning: React.FC = () => {
 // Componente de raios de sol animados
 const SunRays: React.FC = () => {
   return (
-    <div className="absolute top-16 right-4 md:right-1/4 xl:right-1/3 2xl:right-[40%] w-48 h-48 overflow-visible pointer-events-none">
+    <div className="absolute top-16 right-0 md:right-1/4 xl:right-1/3 2xl:right-[40%] w-48 h-48 overflow-hidden pointer-events-none">
       {/* Halo de luz grande */}
       <div className="absolute -inset-8">
         <div className="absolute inset-0 bg-gradient-radial from-amber-300/30 via-orange-300/10 to-transparent rounded-full animate-pulse-slow" />
