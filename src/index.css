@@ -56,6 +56,34 @@
   animation: cloud-float linear infinite;
 }
 
+/* Neblina - movimento sutil e suave */
+@keyframes fog-drift-1 {
+  0%, 100% { opacity: 0.4; transform: translateX(0) scale(1); }
+  50% { opacity: 0.6; transform: translateX(2%) scale(1.02); }
+}
+
+@keyframes fog-drift-2 {
+  0%, 100% { opacity: 0.3; transform: translateX(0) scale(1); }
+  50% { opacity: 0.5; transform: translateX(-2%) scale(1.01); }
+}
+
+@keyframes fog-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.4; }
+}
+
+.animate-fog-1 {
+  animation: fog-drift-1 20s ease-in-out infinite;
+}
+
+.animate-fog-2 {
+  animation: fog-drift-2 25s ease-in-out infinite;
+}
+
+.animate-fog-pulse {
+  animation: fog-pulse 15s ease-in-out infinite;
+}
+
 /* Relâmpago */
 @keyframes lightning {
   0%, 89%, 91%, 93%, 95%, 100% { opacity: 0; }

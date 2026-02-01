@@ -157,21 +157,20 @@ const FloatingClouds: React.FC<{ dark?: boolean }> = ({ dark = false }) => {
 const FogEffect: React.FC<{ dense?: boolean }> = ({ dense = false }) => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Camadas de névoa com movimento sutil */}
+      {/* Camadas de névoa com movimento muito sutil */}
       <div 
-        className={`absolute inset-0 bg-gradient-to-t from-slate-400/40 via-slate-300/20 to-transparent ${dense ? 'opacity-80' : 'opacity-50'}`}
-        style={{ animation: 'cloud-float 60s linear infinite' }}
+        className={`absolute inset-0 bg-gradient-to-t from-slate-400/30 via-slate-300/15 to-transparent animate-fog-1 ${dense ? 'opacity-70' : 'opacity-50'}`}
       />
       <div 
-        className={`absolute inset-0 bg-gradient-to-b from-slate-300/30 via-transparent to-slate-400/30 ${dense ? 'opacity-70' : 'opacity-40'}`}
-        style={{ animation: 'cloud-float 45s linear infinite reverse' }}
+        className={`absolute inset-0 bg-gradient-to-b from-slate-300/20 via-transparent to-slate-400/20 animate-fog-2 ${dense ? 'opacity-60' : 'opacity-40'}`}
       />
-      {/* Faixas de névoa horizontais */}
-      <div className="absolute top-1/4 left-0 right-0 h-24 bg-gradient-to-r from-transparent via-slate-300/30 to-transparent blur-xl"
-        style={{ animation: 'cloud-float 50s linear infinite' }}
+      {/* Faixas de névoa horizontais com pulsação suave */}
+      <div 
+        className={`absolute top-1/4 left-0 right-0 h-32 bg-gradient-to-r from-transparent via-slate-300/20 to-transparent blur-2xl animate-fog-pulse ${dense ? 'opacity-60' : 'opacity-40'}`}
       />
-      <div className="absolute top-2/3 left-0 right-0 h-32 bg-gradient-to-r from-transparent via-slate-400/25 to-transparent blur-2xl"
-        style={{ animation: 'cloud-float 70s linear infinite reverse' }}
+      <div 
+        className={`absolute top-2/3 left-0 right-0 h-40 bg-gradient-to-r from-transparent via-slate-400/15 to-transparent blur-3xl animate-fog-pulse ${dense ? 'opacity-50' : 'opacity-30'}`}
+        style={{ animationDelay: '5s' }}
       />
     </div>
   );
