@@ -172,28 +172,36 @@ function formatWeatherData(
   const currentTimeFromApi = current.time || '';
   const currentHourLocal = extractHour(currentTimeFromApi);
   
-  // Extrair a data do current.time para encontrar o índice correto
-  const currentDateFromApi = currentTimeFromApi.split('T')[0]; // "2026-01-31"
-  
-  // Encontrar o índice correto na array hourly baseado no horário atual da cidade
+  // Calcular o índice correto na array hourly
+  // A API ECMWF retorna hourly.time começando em 00:00 do primeiro dia
+  // Precisamos encontrar a posição correta baseado na hora atual
   let currentHourIndex = 0;
-  if (hourly.time && hourly.time.length > 0) {
-    // Procurar o horário exato ou o mais próximo
+  
+  if (hourly.time && hourly.time.length > 0 && currentTimeFromApi) {
+    // Converter o horário atual da API para timestamp
+    const currentTimestamp = new Date(currentTimeFromApi).getTime();
+    
+    // Encontrar o índice do horário mais próximo (menor ou igual ao atual)
     for (let i = 0; i < hourly.time.length; i++) {
-      const hourTime = hourly.time[i];
-      if (hourTime) {
-        const hourValue = extractHour(hourTime);
-        const hourDate = hourTime.split('T')[0];
-        // Encontrar o índice que corresponde à data e hora atual
-        if (hourDate === currentDateFromApi && hourValue === currentHourLocal) {
-          currentHourIndex = i;
-          break;
-        }
+      const hourTimestamp = new Date(hourly.time[i]).getTime();
+      if (hourTimestamp <= currentTimestamp) {
+        currentHourIndex = i;
+      } else {
+        break; // Paramos quando encontramos um horário futuro
       }
     }
   }
   
   const currentHour = currentHourIndex;
+  
+  // Debug log (remover depois)
+  console.log('Debug hourly:', {
+    currentTimeFromApi,
+    currentHourLocal,
+    currentHourIndex,
+    firstHourlyTime: hourly.time?.[0],
+    selectedHourlyTime: hourly.time?.[currentHourIndex]
+  });
   
   // Pegar sunrise/sunset do primeiro dia para referência
   const todaySunrise = daily.sunrise?.[0] || '06:00';

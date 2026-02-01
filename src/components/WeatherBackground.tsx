@@ -188,36 +188,31 @@ const Lightning: React.FC = () => {
 // Componente de raios de sol animados
 const SunRays: React.FC = () => {
   return (
-    <div className="absolute top-16 right-0 md:right-1/4 xl:right-1/3 2xl:right-[40%] w-48 h-48 overflow-hidden pointer-events-none">
+    <div className="absolute top-8 -right-12 md:right-1/4 xl:right-1/3 2xl:right-[40%] w-40 h-40 pointer-events-none">
       {/* Halo de luz grande */}
-      <div className="absolute -inset-8">
-        <div className="absolute inset-0 bg-gradient-radial from-amber-300/30 via-orange-300/10 to-transparent rounded-full animate-pulse-slow" />
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-radial from-amber-300/25 via-orange-300/10 to-transparent rounded-full animate-pulse-slow scale-150" />
       </div>
       
-      {/* Raios girando */}
+      {/* Raios girando - mais curtos */}
       <div className="absolute inset-0 animate-spin-slow">
         {[...Array(12)].map((_, i) => (
           <div
             key={i}
-            className="absolute top-1/2 left-1/2 w-1.5 h-20 bg-gradient-to-t from-amber-400/50 via-yellow-300/30 to-transparent origin-bottom rounded-full"
+            className="absolute top-1/2 left-1/2 w-1 h-12 bg-gradient-to-t from-amber-400/40 via-yellow-300/20 to-transparent origin-bottom rounded-full"
             style={{
               transform: `translateX(-50%) rotate(${i * 30}deg)`,
-              opacity: i % 2 === 0 ? 0.5 : 0.25
+              opacity: i % 2 === 0 ? 0.4 : 0.2
             }}
           />
         ))}
       </div>
       
       {/* Sol central */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16">
         <div className="absolute inset-0 bg-gradient-radial from-yellow-200 via-amber-300 to-orange-400 rounded-full shadow-lg shadow-amber-400/50 animate-pulse-slow" />
         <div className="absolute inset-2 bg-gradient-radial from-yellow-100 via-yellow-200 to-amber-300 rounded-full" />
       </div>
-      
-      {/* Brilhos flutuantes */}
-      <div className="absolute -top-4 left-8 w-2 h-2 bg-yellow-200 rounded-full animate-float-1 opacity-60" />
-      <div className="absolute top-8 -left-4 w-1.5 h-1.5 bg-amber-200 rounded-full animate-float-2 opacity-50" />
-      <div className="absolute -bottom-4 right-8 w-1 h-1 bg-yellow-100 rounded-full animate-float-3 opacity-70" />
     </div>
   );
 };
